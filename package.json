@@ -1,0 +1,45 @@
+{
+  "name": "ptp-admin",
+  "author": {
+    "name": "Dage",
+    "email": "236010069@qq.com",
+    "url": "http://www.ptp.ink"
+  },
+  "homepage": "http://www.ptp.ink",
+  "license": "MIT",
+  "keywords": [
+    "PTP",
+    "ptp",
+    "admin",
+    "DataManage"
+  ],
+  "description": "PTP官方后台管理系统",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "axios": "^1.6.7",
+    "element-plus": "^2.5.5",
+    "lw_firewords": "^1.0.3",
+    "vue": "^3.3.11",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "lw_firewords": "^1.0.3",
+    "sass": "^1.70.0",
+    "typescript": "^5.3.3",
+    "unplugin-auto-import": "^0.17.5",
+    "unplugin-icons": "^0.18.5",
+    "unplugin-vue-components": "^0.26.0",
+    "vite": "^5.0.10",
+    "vite-plugin-typescript": "^1.0.4"
+  }
+}

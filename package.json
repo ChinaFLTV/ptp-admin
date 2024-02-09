@@ -28,6 +28,7 @@
     "axios": "^1.6.7",
     "element-plus": "^2.5.5",
     "lw_firewords": "^1.0.3",
+    "pinia": "^2.1.7",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"
   },

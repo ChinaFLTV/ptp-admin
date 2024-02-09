@@ -42,6 +42,9 @@
 import LwFireworks from "lw_firewords";
 import {ElMessage} from "element-plus";
 import axios from "axios";
+import {useRouter} from "vue-router";
+import {UserDataStore} from "@/store/user";
+import Administrator from "@/dao/Administrator";
 
 
 // 2024-2-8  15:10-是否显示登录对话框
@@ -52,6 +55,9 @@ const isShowLoginForm = ref(false);
 const isLoggingIn = ref(false);
 // 2024-2-8  19:27-标记当前用户是否可对表单组件进行操作
 const isOperateForm = ref(true);
+
+const router = useRouter();
+const userDataStore = UserDataStore();
 
 
 const loginData = ref({
@@ -129,6 +135,7 @@ function login() {
     }).then(response => {
 
         response = response.data;
+        // @ts-ignore
         if (response === null || response === undefined || response.code != 200) {
 
             ElMessage({
@@ -183,6 +190,12 @@ function login() {
             setTimeout(() => {
 
                 isShowLoginBox.value = false;
+                userDataStore.updateUserData(response.data as Administrator);
+                router.push({
+
+                    name: "main"
+
+                });
 
             }, 200);
 
@@ -267,6 +280,7 @@ function login() {
       height: 35px;
       color: #03e9f4;
       background: transparent;
+      letter-spacing: 4px;
 
       &:hover {
 

@@ -2,10 +2,14 @@
 
     <div class="main">
 
-        <TopBar/>
+        <transition name="el-zoom-in-top">
+            <TopBar v-show="isShowTopBar" ref="topBarRef"/>
+        </transition>
         <el-container class="major-content">
 
-            <SideBar class="main-sideBar"/>
+            <transition name="el-zoom-in-bottom">
+                <SideBar v-show="isShowSideBar" class="main-sideBar"/>
+            </transition>
             <router-view>
             </router-view>
 
@@ -20,6 +24,51 @@
 
 import SideBar from "@/components/main/SideBar.vue";
 import TopBar from "@/components/main/TopBar.vue";
+import {onMounted} from "vue";
+import {ElMessage} from "element-plus";
+
+
+const topBarRef = ref(null);
+
+
+const isShowTopBar = ref(false);
+const isShowSideBar = ref(false);
+
+
+new Promise(resolve => {
+
+    setTimeout(() => {
+
+        isShowTopBar.value = true;
+        resolve();
+
+    }, 2000);
+
+}).then(() => {
+
+    setTimeout(() => {
+
+        isShowSideBar.value = true;
+
+    }, 800);
+
+}).catch(err => {
+
+    ElMessage.error("页面渲染错误");
+    console.log(err);
+
+});
+
+
+onMounted(() => {
+
+    // 2024-2-9  22:48-当显示此页面时，说明此时用户一定已经登录了，于是需要更新顶栏组件状态
+    topBarRef.value.updateComponentStatus();
+
+
+});
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -30,7 +79,11 @@ import TopBar from "@/components/main/TopBar.vue";
   flex-direction: column;
   width: 100vw;
   height: 100vh;
-  background: mediumvioletred;
+  background-image: url("/src/assets/image/login_background.webp");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-clip: border-box;
+  background-size: cover;
 
   .main-sideBar {
 
@@ -43,7 +96,6 @@ import TopBar from "@/components/main/TopBar.vue";
 
 .major-content {
 
-  background: #96c5ff;
   flex: 1;
   display: flex;
 

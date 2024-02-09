@@ -10,10 +10,12 @@
 <script setup lang="ts">
 
 import {useRouter} from "vue-router";
+import {UserDataStore} from "@/store/user";
 
 const router = useRouter();
+const userDataStore = UserDataStore();
 
-if (localStorage.getItem("user")) {
+if (userDataStore.getUserData() !== null) {
 
     router.push({
 

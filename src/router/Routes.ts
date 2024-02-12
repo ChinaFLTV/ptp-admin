@@ -9,13 +9,14 @@
 import Login from "@/views/person/login.vue";
 import MainPage from "@/components/main/MainPage.vue";
 import Profile from "@/views/person/Profile.vue";
+import Empty from "@/views/common/empty.vue";
 
 
 export const routes = [
 
     {
 
-        path: "/user/login",
+        path: "/login",
         name: "login",
         component: Login
 
@@ -24,14 +25,27 @@ export const routes = [
 
         path: "/main",
         name: "main",
-        component: MainPage
+        component: MainPage,
+        children: [
 
-    },
-    {
+            {
 
-        path: "/user/profile",
-        name: "profile",
-        component: Profile
+                path: "/main/empty",
+                name: "empty",
+                component: Empty
+
+            },
+
+            {
+
+                path: "/main/profile",
+                name: "profile",
+                component: Profile,
+                props: true
+
+            }
+
+        ]
 
     }
 

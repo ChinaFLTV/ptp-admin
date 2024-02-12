@@ -2,9 +2,9 @@
 
     <div>
 
-        <el-menu
-                mode="horizontal"
-                :ellipsis="false" background-color="#0D2266" text-color="#ffffff">
+        <el-menu class="topBarMenu"
+                 mode="horizontal"
+                 :ellipsis="false" background-color="#0D2266" text-color="#ffffff">
 
             <el-menu-item index="0" disabled>
                 <img
@@ -71,6 +71,9 @@ const router = useRouter();
 const userDataStore = UserDataStore();
 
 
+const emits = defineEmits(["hideComponent"]);
+
+
 // 2024-2-7  16:18-登录登出回调函数
 function clickDropDownMenuItem(command: number) {
 
@@ -88,9 +91,13 @@ function clickDropDownMenuItem(command: number) {
         case 1:
 
             userDataStore.removeUserData();
-            router.push({
+            emits("hideComponent", () => {
 
-                name: "login"
+                router.push({
+
+                    name: "login"
+
+                });
 
             });
             break;
@@ -122,7 +129,7 @@ function updateComponentStatus() {
     if (userData !== null) {
 
         console.log("更新顶栏组件状态为登录状态");
-        welcomeUserNameRef.value.innerHTML = `欢迎你，${userData.nickname}！`;
+        welcomeUserNameRef.value.innerHTML = `欢迎你，${userData.nickname}`;
         avatarUrl.value = userData.avatar;
 
     }
@@ -141,24 +148,31 @@ defineExpose({
 
 <style lang="scss" scoped>
 
-.topBar-tab-text {
+.topBarMenu {
 
-  font-weight: bolder;
+  // 2024-2-10  15:48-消除el-menu默认border的宽约1px的留白
+  border: 0;
 
-}
+  > .topBar-tab-text {
 
-.flex-grow {
+    font-weight: bolder;
 
-  flex-grow: 1;
+  }
 
-}
+  > .flex-grow {
 
-.dialog_content_contactUs {
+    flex-grow: 1;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  }
+
+  > .dialog_content_contactUs {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+  }
 
 }
 

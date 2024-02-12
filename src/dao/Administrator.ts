@@ -11,7 +11,7 @@
 export default class Administrator {
 
 
-    private readonly id: number;
+    private readonly _id: number;
     private _account: string;
     private _password: string = "";
     private _role: string = "low";
@@ -27,6 +27,13 @@ export default class Administrator {
 
 
     public constructor() {
+
+    }
+
+
+    public get id(): number {
+
+        return this._id;
 
     }
 

@@ -30,4 +30,8 @@ const pinia = createPinia();
 app.use(pinia);
 
 app.use(ElementPlus);
+
+// 2024-2-12  10:54-启动图片预览开源库V-Viewer
+//app.use(VueViewer);
+
 app.mount("#main-area");

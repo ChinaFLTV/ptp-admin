@@ -41,10 +41,10 @@
 
 import LwFireworks from "lw_firewords";
 import {ElMessage} from "element-plus";
-import axios from "axios";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
 import Administrator from "@/dao/Administrator";
+import service from "@/http/service";
 
 
 // 2024-2-8  15:10-是否显示登录对话框
@@ -116,13 +116,8 @@ function login() {
 
     }
 
-    const axiosInstance = axios.create({
 
-        baseURL: "http://119.45.0.82:8080/"
-
-    });
-
-    axiosInstance.get("/manage/administrator/get/single/byAccountAndPassword", {
+    service.get("/manage/administrator/get/single/byAccountAndPassword", {
 
         params: {
 
@@ -198,6 +193,11 @@ function login() {
                 });
 
             }, 200);
+
+        }).catch(err => {
+
+            ElMessage.error("页面渲染错误");
+            console.log(err);
 
         });
 

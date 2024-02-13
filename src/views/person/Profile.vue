@@ -12,14 +12,40 @@
                 <p class="profileValue">{{ userData?.account }}</p>
                 <h3 class="profileKey">密码</h3>
                 <p class="profileValue" style="display: inline-block">{{ desensitize(userData?.password, "*", 0) }}</p>
-                <span class="modify">修改密码</span>
+                <span class="modify" @click="isShowModifyPasswordDialog = true">修改密码</span>
                 <h3 class="profileKey">用户昵称</h3>
                 <p class="profileValue" style="display: inline-block">{{ userData?.nickname }}</p>
                 <span class="modify" @click="isShowRenameDialog = true">修改昵称</span>
                 <h3 class="profileKey">注册时间</h3>
                 <p class="profileValue">{{ dayjs(userData?.registerDate).format("YYYY年M月D日 HH:mm:ss") }}</p>
                 <h3 class="profileKey">家庭住址</h3>
-                <p class="profileValue">{{ userData?.address }}</p>
+                <transition name="el-fade-in-linear">
+                    <div v-show="isShowUserAddress">
+
+                        <p class="profileValue"
+                           style="margin:1rem auto; display: inline-block; color: dimgray;">{{
+                            (JSON.parse(userData?.address) as string[])?.join(" ")
+                            }}</p>
+                        <span class="modify"
+                              @click="isShowUserAddress = false;isShowModifyAddressArea = true;address = JSON.parse(userData.address) as string[]">修改地址</span>
+
+                    </div>
+                </transition>
+
+                <transition name="el-fade-in-linear">
+                    <div v-show="isShowModifyAddressArea" style="margin: 1rem auto">
+
+                        <el-cascader
+                                size="large"
+                                :options="pcaTextArr" v-model="address">
+                        </el-cascader>
+                        <el-button @click="isShowUserAddress = true;isShowModifyAddressArea = false;"
+                                   style="margin-left: 3rem">取消
+                        </el-button>
+                        <el-button type="primary" @click="submitModifyAddress">确定</el-button>
+
+                    </div>
+                </transition>
 
             </div>
             <div class="halfProfileArea">
@@ -58,6 +84,26 @@
 
         </el-dialog>
 
+        <el-dialog v-model="isShowModifyPasswordDialog" title="修改密码" width="500">
+
+            <p class="modifyPasswordLabel">旧密码:</p>
+            <el-input ref="newNicknameRef" v-model="oldPassword" type="password"
+                      placeholder="请输入旧密码" clearable/>
+            <p class="modifyPasswordLabel">新密码:</p>
+            <el-input ref="newNicknameRef" v-model="newPassword" type="password"
+                      placeholder="请输入新密码" clearable/>
+            <p class="modifyPasswordLabel">再次确认新密码:</p>
+            <el-input ref="newNicknameRef" v-model="newPasswordAgain" type="password"
+                      placeholder="请重复新密码" clearable/>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="isShowModifyPasswordDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitModifyPassword">确定</el-button>
+                </div>
+            </template>
+
+        </el-dialog>
+
     </div>
 
 </template>
@@ -73,6 +119,7 @@ import {desensitize} from "@/utils/desensitization";
 import {ImagePreview} from "@daxiazilong/image-preview";
 import {ElMessage} from "element-plus";
 import service from "@/http/service";
+import {pcaTextArr} from "element-china-area-data";
 
 
 const avatarRef = ref(null);
@@ -86,6 +133,15 @@ const userData = ref(userDataStore.getUserData() as Administrator);
 let imagePreview: ImagePreview = null as ImagePreview;
 const isShowRenameDialog = ref(false);
 const newNickname = ref(null as string);
+const isShowModifyPasswordDialog = ref(false);
+const oldPassword = ref(null as string);
+const newPassword = ref(null as string);
+const newPasswordAgain = ref(null as string);
+// 2024-2-13  16:27-用于暂存用户的家庭住址数据
+const address = ref([] as string[]);
+const isShowUserAddress = ref(true);
+const isShowModifyAddressArea = ref(false);
+
 
 onMounted(() => {
 
@@ -163,7 +219,7 @@ function submitRename() {
         userData.value.nickname = newNickname.value;
 
         service.post("/manage/administrator/update/single", userData.value)
-            .then(res => {
+            .then(() => {
 
                 ElMessage({
 
@@ -188,6 +244,130 @@ function submitRename() {
         });
 
     }
+
+}
+
+
+/**
+ *
+ * @author LiGuanda
+ * @date 2024/2/12 下午 9:30:38
+ * @filename Profile.vue
+ * @description 用于提交修改密码的操作
+ *
+ */
+function submitModifyPassword() {
+
+    if (oldPassword.value === "" || newPassword.value === "" || newPasswordAgain.value === "") {
+
+        ElMessage.error("信息不完整");
+        return;
+
+    }
+
+    if (userData.value.password !== oldPassword.value) {
+
+        ElMessage.error("旧密码填写错误");
+        return;
+
+    }
+
+    if (newPassword.value !== newPasswordAgain.value) {
+
+        ElMessage.error("前后两次填写的新密码不一致");
+        return;
+
+    }
+
+    if (oldPassword.value === newPassword.value) {
+
+        ElMessage.error("新密码不能与旧密码相同");
+        return;
+
+    }
+
+    userData.value.password = newPassword.value;
+    service.post("/manage/administrator/update/single", userData.value)
+        .then(() => {
+
+            ElMessage({
+
+                message: "修改密码成功",
+                showClose: true,
+                type: "success",
+                center: true
+
+            });
+            userDataStore.updateUserData(userData.value);
+            oldPassword.value = "" as string;
+            newPassword.value = "" as string;
+            newPasswordAgain.value = "" as string;
+            isShowModifyPasswordDialog.value = false;
+
+        }).catch(err => {
+
+        console.log(err);
+        ElMessage.error("更新密码失败");
+
+        userData.value.password = oldPassword.value;
+        oldPassword.value = "" as string;
+        newPassword.value = "" as string;
+        newPasswordAgain.value = "" as string;
+        isShowModifyPasswordDialog.value = false;
+
+    });
+
+}
+
+
+/**
+ *
+ * @author Lenovo
+ * @date 2024/2/13 下午 4:58:37
+ * @filename Profile.vue
+ * @description 用于提交修改用户家庭住址的操作
+ *
+ */
+function submitModifyAddress() {
+
+    console.log(address.value);
+
+    if (userData.value.address === JSON.stringify(address.value)) {
+
+        ElMessage.warning("前后地址相同，无需修改~");
+        return;
+
+    }
+
+    const oldAddress = userData.value.address;
+
+    userData.value.address = JSON.stringify(address.value);
+    service.post("/manage/administrator/update/single", userData.value)
+        .then(() => {
+
+            ElMessage({
+
+                message: "修改地址成功",
+                showClose: true,
+                type: "success",
+                center: true
+
+            });
+            userDataStore.updateUserData(userData.value);
+            isShowUserAddress.value = true;
+            isShowModifyAddressArea.value = false;
+
+        }).catch(err => {
+
+        console.log(err);
+        ElMessage.error("更新地址失败");
+
+        userData.value.address = oldAddress;
+        userDataStore.updateUserData(userData.value);
+        isShowUserAddress.value = true;
+        isShowModifyAddressArea.value = false;
+
+    });
 
 }
 
@@ -265,6 +445,12 @@ function submitRename() {
       }
 
     }
+
+  }
+
+  .modifyPasswordLabel {
+
+    margin: 1.5rem 0 1.5rem 0;
 
   }
 

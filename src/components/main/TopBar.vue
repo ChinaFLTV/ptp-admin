@@ -18,7 +18,7 @@
             <el-menu-item class="topBar-tab-text" @click="contactUsDialogVisible = true" index="1">与我们联系
             </el-menu-item>
             <el-menu-item>
-                <span ref="welcomeUserNameRef">请登录</span>
+                <span ref="welcomeUserNameRef">{{ userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}` }}</span>
             </el-menu-item>
             <el-menu-item>
                 <el-dropdown @command="clickDropDownMenuItem">

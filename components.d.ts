@@ -12,6 +12,7 @@ declare module 'vue' {
     DialogManange: typeof import('./src/components/content/DialogManange.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElCascader: typeof import('element-plus/es')['ElCascader']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']

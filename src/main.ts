@@ -34,4 +34,7 @@ app.use(ElementPlus);
 // 2024-2-12  10:54-启动图片预览开源库V-Viewer
 //app.use(VueViewer);
 
+// 2024-2-13  14:37-引入地址选择器组件v-distpicker
+//app.component("v-distpicker", Distpicker);
+
 app.mount("#main-area");

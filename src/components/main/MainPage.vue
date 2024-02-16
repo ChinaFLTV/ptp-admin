@@ -10,8 +10,15 @@
             <transition name="el-zoom-in-bottom">
                 <SideBar v-show="isShowSideBar" class="main-sideBar"/>
             </transition>
-            <router-view class="contentShowContainer">
-            </router-view>
+
+            <div class="contentShowContainer">
+
+                <transition name="el-zoom-in-top">
+                    <PageTabs v-show="isShowPageTabs"/>
+                </transition>
+                <router-view></router-view>
+
+            </div>
 
         </el-container>
 
@@ -36,6 +43,7 @@ const topBarRef = ref(null);
 
 const isShowTopBar = ref(false);
 const isShowSideBar = ref(false);
+const isShowPageTabs = ref(false);
 const router = useRouter();
 const userDataStore = UserDataStore();
 const localUserData = ref(null as Administrator);
@@ -56,15 +64,29 @@ new Promise(resolve => {
 
         isShowSideBar.value = true;
 
+    }, 800);
+
+}).then(() => {
+
+    setTimeout(() => {
+
+        isShowPageTabs.value = true;
+
+    }, 1500);
+
+}).then(() => {
+
+    setTimeout(() => {
+
+        // 2024-2-16  12:33-自动导航至数据看板页面
         // 2024-2-10  17:19-自动导航至空页面
         router.push({
 
-            name: "empty"
+            name: "dashboard"
 
         });
 
-
-    }, 800);
+    }, 500);
 
 }).catch(err => {
 
@@ -117,9 +139,17 @@ function hideComponent(action: () => any) {
         setTimeout(() => {
 
             isShowTopBar.value = false;
-            action();
 
         }, 800);
+
+    }).then(() => {
+
+        setTimeout(() => {
+
+            isShowPageTabs.value = false;
+            action();
+
+        }, 1000);
 
     }).catch(err => {
 

@@ -7,6 +7,10 @@ import "element-plus/dist/index.css";
 import * as VueRouter from "vue-router";
 import {createPinia} from "pinia";
 import {routes} from "@/router/Routes";
+import {NavigateStore} from "@/store/navigate";
+import randomUUID from "@/utils/uuid";
+import {NavigationType} from "@/enums/NavigationType";
+import {Page} from "@/dao/page";
 
 
 // @ts-ignore
@@ -23,11 +27,54 @@ const router = VueRouter.createRouter({
     routes
 
 });
-app.use(router);
+
 
 // 2024-2-8  21:41-初始化Pinia数据管理框架
 const pinia = createPinia();
 app.use(pinia);
+
+
+const navigateStore = NavigateStore();
+router.beforeEach((to) => {
+
+    switch (parseInt(to.query.type as string)) {
+
+        case NavigationType.PROFILE:
+        case NavigationType.DASHBOARD:
+        case NavigationType.DATA_MANAGE:
+        case NavigationType.USER_MANAGE:
+        case NavigationType.VERSION_CONTROL:
+
+            const page: Page = {
+
+                title: to.meta.title as string,
+                name: to.name.toString(),
+                path: to.path,
+                id: randomUUID(),
+                draggable: true,
+                closeable: true,
+                cached: true
+
+            };
+            navigateStore.openedPages.push(page);
+            navigateStore.currentOpenedPage = page;
+
+            break;
+
+        case NavigationType.LOGIN:
+        case NavigationType.LOGOUT:
+        case NavigationType.TAB_EXCHANGE:
+        case NavigationType.TAB_CLOSE:
+        default:
+
+            break;
+
+    }
+    return true;
+
+});
+app.use(router);
+
 
 app.use(ElementPlus);
 

@@ -6,3 +6,13 @@ declare module "*.vue" {
 
 }
 
+// 2024-2-15  16:31-限定Route中的meta中的字段类型
+// declare module "vue-router" {
+//
+//     interface RouteMeta {
+//
+//         title: string;
+//
+//     }
+//
+// }

@@ -58,7 +58,7 @@
                 <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
                 <h3 class="profileKey">性别</h3>
                 <p class="profileValue">{{
-                    userData?.sex === "male" ? "男" : userData.sex === "female" ? "女" : "保密"
+                    userData?.sex === "male" ? "男" : userData?.sex === "female" ? "女" : "保密"
                     }}</p>
                 <h3 class="profileKey">信誉积分</h3>
                 <p ref="creditRef" class="profileValue"
@@ -132,11 +132,11 @@ const userDataStore = UserDataStore();
 const userData = ref(userDataStore.getUserData() as Administrator);
 let imagePreview: ImagePreview = null as ImagePreview;
 const isShowRenameDialog = ref(false);
-const newNickname = ref(null as string);
+const newNickname = ref("");
 const isShowModifyPasswordDialog = ref(false);
-const oldPassword = ref(null as string);
-const newPassword = ref(null as string);
-const newPasswordAgain = ref(null as string);
+const oldPassword = ref("");
+const newPassword = ref("");
+const newPasswordAgain = ref("");
 // 2024-2-13  16:27-用于暂存用户的家庭住址数据
 const address = ref([] as string[]);
 const isShowUserAddress = ref(true);
@@ -150,17 +150,17 @@ onMounted(() => {
     if (credit >= 80) {
 
         creditRef.value.style.color = "#00ff00";
-        creditRef.value.style.backgroundColor = "#c6ffc6";
+        creditRef.value.style.backgroundColor = "#c6ffc670";
 
     } else if (credit >= 60) {
 
         creditRef.value.style.color = "#ffff00";
-        creditRef.value.style.backgroundColor = "#ffffB8";
+        creditRef.value.style.backgroundColor = "#ffffB870";
 
     } else {
 
         creditRef.value.style.color = "#ff0000";
-        creditRef.value.style.backgroundColor = "#ffa2a2";
+        creditRef.value.style.backgroundColor = "#ffa2a270";
 
     }
 
@@ -206,9 +206,19 @@ function previewAvatar() {
  */
 function submitRename() {
 
-    if (newNickname.value.length < 2) {
+    if (newNickname.value === "") {
+
+        ElMessage.error("昵称不能为空~");
+        return;
+
+    } else if (newNickname.value.length < 2) {
 
         ElMessage.error("用户昵称不能少于两个字符~");
+        return;
+
+    } else if (newNickname.value === userData.value.nickname) {
+
+        ElMessage.warning("新昵称与旧昵称相同，无需修改~");
         return;
 
     } else {

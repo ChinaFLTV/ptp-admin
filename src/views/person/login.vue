@@ -45,6 +45,7 @@ import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
 import Administrator from "@/dao/Administrator";
 import service from "@/http/service";
+import {NavigationType} from "@/enums/NavigationType";
 
 
 // 2024-2-8  15:10-是否显示登录对话框
@@ -188,7 +189,12 @@ function login() {
                 userDataStore.updateUserData(response.data as Administrator);
                 router.push({
 
-                    name: "main"
+                    name: "main",
+                    query: {
+
+                        type: NavigationType.LOGIN
+
+                    }
 
                 });
 

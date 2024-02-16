@@ -18,7 +18,9 @@
             <el-menu-item class="topBar-tab-text" @click="contactUsDialogVisible = true" index="1">与我们联系
             </el-menu-item>
             <el-menu-item>
-                <span ref="welcomeUserNameRef">{{ userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}` }}</span>
+                <span ref="welcomeUserNameRef">{{
+                    userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
+                    }}</span>
             </el-menu-item>
             <el-menu-item>
                 <el-dropdown @command="clickDropDownMenuItem">
@@ -59,6 +61,7 @@ import qq_qrcode from "@/assets/image/qq_qrcode.jpg";
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
+import {NavigationType} from "@/enums/NavigationType";
 
 
 const welcomeUserNameRef = ref(null);
@@ -83,7 +86,12 @@ function clickDropDownMenuItem(command: number) {
 
             router.push({
 
-                name: "profile"
+                name: "profile",
+                query: {
+
+                    type: NavigationType.PROFILE
+
+                }
 
             });
             break;
@@ -95,7 +103,12 @@ function clickDropDownMenuItem(command: number) {
 
                 router.push({
 
-                    name: "login"
+                    name: "login",
+                    query: {
+
+                        type: NavigationType.LOGOUT
+
+                    }
 
                 });
 

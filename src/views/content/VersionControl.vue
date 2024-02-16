@@ -1,6 +1,6 @@
 <template>
 
-    <h1>数据看板</h1>
+    <h1 style="color: green;">版本控制</h1>
 
 </template>
 

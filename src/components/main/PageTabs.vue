@@ -1,0 +1,214 @@
+<template>
+
+    <el-scrollbar class="pageTabsContainer">
+
+        <div style="display:flex;max-width: 100%;margin-left: 1rem;">
+
+             <span @click="clickPageTab(page)" class="tab"
+                   :class="{activeTab:page.id===navigateStore.currentOpenedPage.id}"
+                   :style="{pointerEvents:(page.id!==navigateStore.currentOpenedPage.id?'auto':'none')}"
+                   v-for="page in navigateStore.openedPages" :key="page.id">
+
+            <span style="display: inline-flex;justify-content: center;align-items: center;flex-wrap: wrap;">
+
+                <span class="title" :style="{color:(page.id===navigateStore.currentOpenedPage.id?'white':'#606266')}">{{
+                    page.title
+                    }}</span>
+                <el-icon v-if="page.closeable" style="margin-left: 1rem;"><Close
+                        @click.stop="closeTab(page)"
+                        style="color: dimgray"/></el-icon>
+                <span v-if="page.cached" class="cache"></span>
+
+            </span>
+
+        </span>
+
+        </div>
+
+    </el-scrollbar>
+
+</template>
+
+
+<script setup lang="ts">
+
+import {Close} from "@element-plus/icons-vue";
+import {NavigateStore} from "@/store/navigate";
+import {useRouter} from "vue-router";
+import {ElMessage} from "element-plus";
+import {NavigationType} from "@/enums/NavigationType";
+import {Page} from "@/dao/page";
+
+
+const navigateStore = NavigateStore();
+const router = useRouter();
+
+/**
+ *
+ * @author LiGuanda
+ * @date 2024/2/14 下午 1:05:25
+ * @filename PageTabs.vue
+ * @description 用于作为用户点击页面选项卡的回调事件
+ *
+ */
+function clickPageTab(page) {
+
+    const oldCurrentOpenedPage = navigateStore.currentOpenedPage;
+
+    try {
+
+
+        router.push({
+
+            name: page.name,
+            query: {
+
+                type: NavigationType.TAB_EXCHANGE
+
+            }
+
+        })?.then(failure => {
+
+            if (failure) {
+
+                console.log(failure);
+                ElMessage({
+
+                    message: "重复点击",
+                    showClose: true,
+                    type: "warning",
+                    center: true
+
+                });
+
+            } else {
+
+                navigateStore.currentOpenedPage = page;
+
+            }
+
+        });
+
+    } catch (err) {
+
+        console.log(err);
+        ElMessage.error("页面渲染错误");
+        navigateStore.currentOpenedPage = oldCurrentOpenedPage;
+
+    }
+
+}
+
+
+/**
+ *
+ * @author Lenovo
+ * @date 2024/2/16 下午 4:26:52
+ * @filename PageTabs.vue
+ * @description 关闭页面选项卡
+ *
+ */
+function closeTab(page: Page) {
+
+    const index = navigateStore.removePage(page.id);
+
+    // 2024-2-16  16:45-只有当前页面为待关闭页面时，才去主动加载其他页面，否则其他保持不变
+    if (page.id === navigateStore.currentOpenedPage.id) {
+
+        const newPage = navigateStore.openedPages[index - 1];
+
+        router.push({
+
+            name: newPage?.name,
+            query: {
+
+                type: NavigationType.TAB_CLOSE
+
+            }
+
+        }).then(failure => {
+
+            if (failure) {
+
+                ElMessage.error("页面渲染错误");
+                console.error(failure);
+
+            } else {
+
+                navigateStore.currentOpenedPage = newPage;
+
+            }
+
+        });
+
+    }
+
+}
+
+
+</script>
+
+
+<style scoped lang="scss">
+
+.pageTabsContainer {
+
+  height: 50px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+
+  .tab {
+
+    display: inline-block;
+    text-align: center;
+    padding: 0 1rem 0 1rem;
+    height: 38px;
+    margin-right: 2rem;
+    margin-top: 6px;
+    line-height: 38px;
+    border-radius: 5px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    .title {
+
+      user-select: none;
+      letter-spacing: 0.1rem;
+      font-weight: bolder;
+
+    }
+
+    &:hover {
+
+      background-color: #5240ff30;
+      color: #5240ff;
+
+    }
+
+    .cache {
+
+      display: block;
+      min-width: 15px;
+      max-width: 60px;
+      border-radius: 999px;
+      background-color: #ff0000;
+      height: 3px;
+      flex-basis: 100%;
+
+    }
+
+  }
+
+  .activeTab {
+
+    font-weight: bolder;
+    background-color: #0D2266;
+
+  }
+
+
+}
+
+</style>

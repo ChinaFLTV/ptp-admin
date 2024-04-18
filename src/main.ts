@@ -10,7 +10,9 @@ import {routes} from "@/router/Routes";
 import {NavigateStore} from "@/store/navigate";
 import randomUUID from "@/utils/uuid";
 import {NavigationType} from "@/enums/NavigationType";
-import {Page} from "@/dao/page";
+import {Page} from "@/entity/page";
+// 导入中文
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 
 // @ts-ignore
@@ -41,7 +43,7 @@ router.beforeEach((to) => {
 
         case NavigationType.PROFILE:
         case NavigationType.DASHBOARD:
-        case NavigationType.DATA_MANAGE:
+        case NavigationType.CONTENT_MANAGE:
         case NavigationType.USER_MANAGE:
         case NavigationType.VERSION_CONTROL:
 
@@ -50,14 +52,26 @@ router.beforeEach((to) => {
                 title: to.meta.title as string,
                 name: to.name.toString(),
                 path: to.path,
+                openTime: new Date(),
                 id: randomUUID(),
                 draggable: true,
                 closeable: true,
                 cached: true
 
             };
-            navigateStore.openedPages.push(page);
-            navigateStore.currentOpenedPage = page;
+
+            if (navigateStore.openedPages.filter(p => p.path == page.path).length > 0) {
+
+                // 2024-4-18  15:24-说明已经打开过相同标签，此时直接跳回已打开的相同标签
+                const index = navigateStore.openedPages.findIndex(p => p.path == page.path);
+                navigateStore.currentOpenedPage = navigateStore.openedPages[index];
+
+            } else {
+
+                navigateStore.openedPages.push(page);
+                navigateStore.currentOpenedPage = page;
+
+            }
 
             break;
 
@@ -76,7 +90,12 @@ router.beforeEach((to) => {
 app.use(router);
 
 
-app.use(ElementPlus);
+app.use(ElementPlus, {
+
+    // 2024-2-18  15:29-调整ElementPlus语言为中文
+    locale: zhCn
+
+});
 
 // 2024-2-12  10:54-启动图片预览开源库V-Viewer
 //app.use(VueViewer);

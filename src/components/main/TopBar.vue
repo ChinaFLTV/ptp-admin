@@ -1,55 +1,55 @@
 <template>
 
-    <div>
+  <div>
 
-        <el-menu class="topBarMenu"
-                 mode="horizontal"
-                 :ellipsis="false" background-color="#0D2266" text-color="#ffffff">
+    <el-menu class="topBarMenu"
+             mode="horizontal"
+             :ellipsis="false" background-color="#0D2266" text-color="#ffffff">
 
-            <el-menu-item index="0" disabled>
-                <img
-                        class="logo"
-                        src="../../assets/logo.svg"
-                        alt="PTP LOGO"
-                        style="width: 60px"
-                />
-            </el-menu-item>
-            <div class="flex-grow"/>
-            <el-menu-item class="topBar-tab-text" @click="contactUsDialogVisible = true" index="1">与我们联系
-            </el-menu-item>
-            <el-menu-item>
+      <el-menu-item index="0" disabled>
+        <img
+            class="logo"
+            src="../../assets/logo.svg"
+            alt="PTP LOGO"
+            style="width: 60px"
+        />
+      </el-menu-item>
+      <div class="flex-grow"/>
+      <el-menu-item class="topBar-tab-text" @click="contactUsDialogVisible = true" index="1">与我们联系
+      </el-menu-item>
+      <el-menu-item>
                 <span ref="welcomeUserNameRef">{{
                     userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
-                    }}</span>
-            </el-menu-item>
-            <el-menu-item>
-                <el-dropdown @command="clickDropDownMenuItem">
-                    <el-avatar ref="avatarRef" :size="40" :src="avatarUrl"/>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item :command="0">个人信息</el-dropdown-item>
-                            <el-dropdown-item :command="1">退出登录</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-            </el-menu-item>
+                  }}</span>
+      </el-menu-item>
+      <el-menu-item>
+        <el-dropdown @command="clickDropDownMenuItem">
+          <el-avatar ref="avatarRef" :size="40" :src="avatarUrl"/>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item :command="0">个人信息</el-dropdown-item>
+              <el-dropdown-item :command="1">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </el-menu-item>
 
-        </el-menu>
+    </el-menu>
 
 
-        <!--  2024-1-16  22:33-不可见组件  -->
-        <el-dialog v-model="contactUsDialogVisible" title="联系我们" draggable center>
+    <!--  2024-1-16  22:33-不可见组件  -->
+    <el-dialog v-model="contactUsDialogVisible" title="联系我们" draggable center>
 
-            <div class="dialog_content_contactUs">
+      <div class="dialog_content_contactUs">
 
-                <el-text type="primary">欢迎添加达哥QQ，与达哥一起探索编程世界！</el-text>
-                <el-image style="width:300px" :src="qq_qrcode" alt="达哥QQ二维码"/>
+        <el-text type="primary">欢迎添加达哥QQ，与达哥一起探索编程世界！</el-text>
+        <el-image style="width:300px" :src="qq_qrcode" alt="达哥QQ二维码"/>
 
-            </div>
+      </div>
 
-        </el-dialog>
+    </el-dialog>
 
-    </div>
+  </div>
 
 </template>
 
@@ -80,46 +80,46 @@ const emits = defineEmits(["hideComponent"]);
 // 2024-2-7  16:18-登录登出回调函数
 function clickDropDownMenuItem(command: number) {
 
-    switch (command) {
+  switch (command) {
 
-        case 0:
+    case 0:
 
-            router.push({
+      router.push({
 
-                name: "profile",
-                query: {
+        name: "profile",
+        query: {
 
-                    type: NavigationType.PROFILE
+          type: NavigationType.PROFILE
 
-                }
+        }
 
-            });
-            break;
+      });
+      break;
 
-        case 1:
+    case 1:
 
-            userDataStore.removeUserData();
-            emits("hideComponent", () => {
+      userDataStore.removeUserData();
+      emits("hideComponent", () => {
 
-                router.push({
+        router.push({
 
-                    name: "login",
-                    query: {
+          name: "login",
+          query: {
 
-                        type: NavigationType.LOGOUT
+            type: NavigationType.LOGOUT
 
-                    }
+          }
 
-                });
+        });
 
-            });
-            break;
+      });
+      break;
 
-        default:
+    default:
 
-            break;
+      break;
 
-    }
+  }
 
 }
 
@@ -134,24 +134,24 @@ function clickDropDownMenuItem(command: number) {
  */
 function updateComponentStatus() {
 
-    console.log("开始更新顶栏组件状态");
+  console.log("开始更新顶栏组件状态");
 
-    const userData = userDataStore.getUserData();
+  const userData = userDataStore.getUserData();
 
-    // 2024-2-9  18:31-当进入该页面时，基本确定本地存在用户数据，因此可以立即填充用户相关的数据展示区域
-    if (userData !== null) {
+  // 2024-2-9  18:31-当进入该页面时，基本确定本地存在用户数据，因此可以立即填充用户相关的数据展示区域
+  if (userData !== null) {
 
-        console.log("更新顶栏组件状态为登录状态");
-        welcomeUserNameRef.value.innerHTML = `欢迎你，${userData.nickname}`;
-        avatarUrl.value = userData.avatar;
+    console.log("更新顶栏组件状态为登录状态");
+    welcomeUserNameRef.value.innerHTML = `欢迎你，${userData.nickname}`;
+    avatarUrl.value = userData.avatar;
 
-    }
+  }
 
 }
 
 defineExpose({
 
-    updateComponentStatus
+  updateComponentStatus
 
 });
 

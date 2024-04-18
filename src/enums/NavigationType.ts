@@ -14,7 +14,7 @@ export enum NavigationType {
     LOGOUT,
     PROFILE,
     DASHBOARD,
-    DATA_MANAGE,
+    CONTENT_MANAGE,
     USER_MANAGE,
     VERSION_CONTROL
 

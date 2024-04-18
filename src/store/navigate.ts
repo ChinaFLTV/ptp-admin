@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import randomUUID from "@/utils/uuid";
-import {Page} from "@/dao/page";
+import {Page} from "@/entity/page";
 import {Ref} from "vue";
 
 export const NavigateStore = defineStore("navigateStore", {

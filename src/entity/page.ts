@@ -13,6 +13,7 @@ export interface Page {
     name: string,
     path: string,
     id: number,
+    openTime: Date,
     draggable: boolean,
     closeable: boolean,
     cached: boolean

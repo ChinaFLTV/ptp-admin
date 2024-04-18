@@ -40,7 +40,6 @@ if (userDataStore.getUserData() !== null) {
 
 .appContainer {
 
-  width: 100vw;
   height: 100vh;
   background-color: antiquewhite;
 

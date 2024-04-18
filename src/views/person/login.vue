@@ -1,36 +1,36 @@
 <template>
 
-    <div class="loginContainer">
+  <div class="loginContainer">
 
-        <transition name="el-zoom-in-center">
-            <div v-show="isShowLoginBox" class="formContainer">
+    <transition name="el-zoom-in-center">
+      <div v-show="isShowLoginBox" class="formContainer">
 
-                <transition name="el-fade-in-linear">
-                    <h3 v-show="isShowLoginForm" class="loginTitle">LOGIN</h3>
-                </transition>
-                <transition name="el-zoom-in-bottom">
-                    <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
-                              placeholder="请输入账号"
-                              input-style="{background-color:transparent;color:antiquewhite;}"
-                              v-model="loginData.account" clearable/>
-                </transition>
-                <transition name="el-zoom-in-bottom">
-                    <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
-                              placeholder="请输入密码"
-                              input-style="{background-color:transparent;color:antiquewhite;}"
-                              :show-password="true" v-model="loginData.password" clearable/>
-                </transition>
-                <transition name="el-zoom-in-bottom">
-                    <el-button :loading="isLoggingIn" :disabled="!isOperateForm" class="loginButton"
-                               v-show="isShowLoginForm" type="primary"
-                               @click="login">登录
-                    </el-button>
-                </transition>
-
-            </div>
+        <transition name="el-fade-in-linear">
+          <h3 v-show="isShowLoginForm" class="loginTitle">LOGIN</h3>
+        </transition>
+        <transition name="el-zoom-in-bottom">
+          <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
+                    placeholder="请输入账号"
+                    input-style="{background-color:transparent;color:antiquewhite;}"
+                    v-model="loginData.account" clearable/>
+        </transition>
+        <transition name="el-zoom-in-bottom">
+          <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
+                    placeholder="请输入密码"
+                    input-style="{background-color:transparent;color:antiquewhite;}"
+                    :show-password="true" v-model="loginData.password" clearable/>
+        </transition>
+        <transition name="el-zoom-in-bottom">
+          <el-button :loading="isLoggingIn" :disabled="!isOperateForm" class="loginButton"
+                     v-show="isShowLoginForm" type="primary"
+                     @click="login">登录
+          </el-button>
         </transition>
 
-    </div>
+      </div>
+    </transition>
+
+  </div>
 
 </template>
 
@@ -43,7 +43,7 @@ import LwFireworks from "lw_firewords";
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
-import Administrator from "@/dao/Administrator";
+import Administrator from "@/entity/Administrator";
 import service from "@/http/service";
 import {NavigationType} from "@/enums/NavigationType";
 
@@ -63,8 +63,8 @@ const userDataStore = UserDataStore();
 
 const loginData = ref({
 
-    account: "",
-    password: ""
+  account: "",
+  password: ""
 
 });
 
@@ -75,139 +75,139 @@ lw_f.init();//启动事件
 
 new Promise((resolve) => {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        isShowLoginBox.value = true;
-        resolve();
+    isShowLoginBox.value = true;
+    resolve(null);
 
-    }, 2000);
+  }, 2000);
 
 }).then(() => {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        isShowLoginForm.value = true;
+    isShowLoginForm.value = true;
 
-    }, 800);
+  }, 800);
 
 }).catch(err => {
 
-    ElMessage.error("页面渲染错误");
-    console.log(err);
+  ElMessage.error("页面渲染错误");
+  console.log(err);
 
 });
 
 function login() {
 
-    isLoggingIn.value = true;
+  isLoggingIn.value = true;
 
-    if (loginData.value.account.toString().trim() === "" || loginData.value.password.toString().trim() === "") {
+  if (loginData.value.account.toString().trim() === "" || loginData.value.password.toString().trim() === "") {
 
-        ElMessage({
+    ElMessage({
 
-            message: "信息不完整",
-            showClose: true,
-            type: "error",
-            center: true
+      message: "信息不完整",
+      showClose: true,
+      type: "error",
+      center: true
 
-        });
-        isLoggingIn.value = false;
-        isOperateForm.value = true;
-        return;
+    });
+    isLoggingIn.value = false;
+    isOperateForm.value = true;
+    return;
+
+  }
+
+
+  service.get("/manage/administrator/get/single/byAccountAndPassword", {
+
+    params: {
+
+      account: loginData.value.account,
+      password: loginData.value.password
+
+    },
+    timeout: 5000
+
+  }).then(response => {
+
+    response = response.data;
+    // @ts-ignore
+    if (response === null || response === undefined || response.code != 200) {
+
+      ElMessage({
+
+        message: "登录出错",
+        showClose: true,
+        type: "error",
+        center: true
+
+      });
+      isLoggingIn.value = false;
+      isOperateForm.value = true;
+      return;
+
+    } else if (response.data === null) {
+
+      ElMessage({
+
+        message: "账号或密码不正确",
+        showClose: true,
+        type: "error",
+        center: true
+
+      });
+      isLoggingIn.value = false;
+      isOperateForm.value = true;
+      return;
 
     }
 
+    ElMessage({
 
-    service.get("/manage/administrator/get/single/byAccountAndPassword", {
-
-        params: {
-
-            account: loginData.value.account,
-            password: loginData.value.password
-
-        },
-        timeout: 5000
-
-    }).then(response => {
-
-        response = response.data;
-        // @ts-ignore
-        if (response === null || response === undefined || response.code != 200) {
-
-            ElMessage({
-
-                message: "登录出错",
-                showClose: true,
-                type: "error",
-                center: true
-
-            });
-            isLoggingIn.value = false;
-            isOperateForm.value = true;
-            return;
-
-        } else if (response.data === null) {
-
-            ElMessage({
-
-                message: "账号或密码不正确",
-                showClose: true,
-                type: "error",
-                center: true
-
-            });
-            isLoggingIn.value = false;
-            isOperateForm.value = true;
-            return;
-
-        }
-
-        ElMessage({
-
-            message: "校验通过，请稍后",
-            showClose: true,
-            type: "success",
-            center: true
-
-        });
-        isLoggingIn.value = false;
-        isOperateForm.value = false;
-        new Promise(resolve => {
-
-            setTimeout(() => {
-
-                isShowLoginForm.value = false;
-                resolve();
-
-            }, 500);
-
-        }).then(() => {
-
-            setTimeout(() => {
-
-                isShowLoginBox.value = false;
-                userDataStore.updateUserData(response.data as Administrator);
-                router.push({
-
-                    name: "main",
-                    query: {
-
-                        type: NavigationType.LOGIN
-
-                    }
-
-                });
-
-            }, 200);
-
-        }).catch(err => {
-
-            ElMessage.error("页面渲染错误");
-            console.log(err);
-
-        });
+      message: "校验通过，请稍后",
+      showClose: true,
+      type: "success",
+      center: true
 
     });
+    isLoggingIn.value = false;
+    isOperateForm.value = false;
+    new Promise(resolve => {
+
+      setTimeout(() => {
+
+        isShowLoginForm.value = false;
+        resolve(null);
+
+      }, 500);
+
+    }).then(() => {
+
+      setTimeout(() => {
+
+        isShowLoginBox.value = false;
+        userDataStore.updateUserData(response.data as Administrator);
+        router.push({
+
+          name: "main",
+          query: {
+
+            type: NavigationType.LOGIN
+
+          }
+
+        });
+
+      }, 200);
+
+    }).catch(err => {
+
+      ElMessage.error("页面渲染错误");
+      console.log(err);
+
+    });
+
+  });
 
 
 }
@@ -219,7 +219,7 @@ function login() {
 
 .loginContainer {
 
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   background-image: url("/src/assets/image/login_background.webp");
   background-repeat: no-repeat;

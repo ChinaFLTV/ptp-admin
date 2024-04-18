@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import Administrator from "@/dao/Administrator";
+import Administrator from "@/entity/Administrator";
 import {Ref} from "vue";
 
 export const UserDataStore = defineStore("userData", {

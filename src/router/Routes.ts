@@ -11,7 +11,7 @@ import MainPage from "@/components/main/MainPage.vue";
 import Profile from "@/views/person/Profile.vue";
 import Empty from "@/views/common/empty.vue";
 import DashBoard from "@/views/content/DashBoard.vue";
-import DataManage from "@/views/content/DataManage.vue";
+import ContentManage from "@/views/content/ContentManage.vue";
 import UserManage from "@/views/content/UserManage.vue";
 import VersionControl from "@/views/content/VersionControl.vue";
 
@@ -76,9 +76,9 @@ export const routes = [
 
                     }, {
 
-                        path: "datamanage",
-                        name: "dataManage",
-                        component: DataManage,
+                        path: "contentmanage",
+                        name: "contentManage",
+                        component: ContentManage,
                         meta: {
 
                             title: "数据管理"

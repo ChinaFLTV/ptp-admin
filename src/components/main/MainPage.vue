@@ -1,28 +1,28 @@
 <template>
 
-    <div class="main">
+  <div class="main">
+
+    <transition name="el-zoom-in-top">
+      <TopBar v-show="isShowTopBar" ref="topBarRef" @hideComponent="hideComponent"/>
+    </transition>
+    <el-container class="major-content">
+
+      <transition name="el-zoom-in-bottom">
+        <SideBar v-show="isShowSideBar" class="main-side-bar-container"/>
+      </transition>
+
+      <div class="main-content-container">
 
         <transition name="el-zoom-in-top">
-            <TopBar v-show="isShowTopBar" ref="topBarRef" @hideComponent="hideComponent"/>
+          <PageTabs class="main-page-tabs-container" v-show="isShowPageTabs"/>
         </transition>
-        <el-container class="major-content">
+        <router-view class="main-content-show-container"></router-view>
 
-            <transition name="el-zoom-in-bottom">
-                <SideBar v-show="isShowSideBar" class="main-sideBar"/>
-            </transition>
+      </div>
 
-            <div class="contentShowContainer">
+    </el-container>
 
-                <transition name="el-zoom-in-top">
-                    <PageTabs v-show="isShowPageTabs"/>
-                </transition>
-                <router-view></router-view>
-
-            </div>
-
-        </el-container>
-
-    </div>
+  </div>
 
 </template>
 
@@ -35,7 +35,7 @@ import {onMounted} from "vue";
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
-import Administrator from "@/dao/Administrator";
+import Administrator from "@/entity/Administrator";
 
 
 const topBarRef = ref(null);
@@ -51,56 +51,56 @@ const localUserData = ref(null as Administrator);
 
 new Promise(resolve => {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        isShowTopBar.value = true;
-        resolve();
+    isShowTopBar.value = true;
+    resolve(0);
 
-    }, 2000);
-
-}).then(() => {
-
-    setTimeout(() => {
-
-        isShowSideBar.value = true;
-
-    }, 800);
+  }, 2000);
 
 }).then(() => {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        isShowPageTabs.value = true;
+    isShowSideBar.value = true;
 
-    }, 1500);
+  }, 800);
 
 }).then(() => {
 
-    setTimeout(() => {
+  setTimeout(() => {
 
-        // 2024-2-16  12:33-自动导航至数据看板页面
-        // 2024-2-10  17:19-自动导航至空页面
-        router.push({
+    isShowPageTabs.value = true;
 
-            name: "dashboard"
+  }, 1500);
 
-        });
+}).then(() => {
 
-    }, 500);
+  setTimeout(() => {
+
+    // 2024-2-16  12:33-自动导航至数据看板页面
+    // 2024-2-10  17:19-自动导航至空页面
+    router.push({
+
+      name: "dashboard"
+
+    });
+
+  }, 500);
 
 }).catch(err => {
 
-    ElMessage.error("页面渲染错误");
-    console.log(err);
+  ElMessage.error("页面渲染错误");
+  console.log(err);
 
 });
 
 
 onMounted(() => {
 
-    // 2024-2-9  22:48-当显示此页面时，说明此时用户一定已经登录了，于是需要更新顶栏组件状态
-    topBarRef.value.updateComponentStatus();
-    localUserData.value = userDataStore.getUserData() as Administrator;
+  // 2024-2-9  22:48-当显示此页面时，说明此时用户一定已经登录了，于是需要更新顶栏组件状态
+  topBarRef.value.updateComponentStatus();
+  localUserData.value = userDataStore.getUserData() as Administrator;
 
 });
 
@@ -116,47 +116,47 @@ onMounted(() => {
  */
 function hideComponent(action: () => any) {
 
-    ElMessage({
+  ElMessage({
 
-        message: "正在登出...",
-        showClose: true,
-        type: "warning",
-        center: true
+    message: "正在登出...",
+    showClose: true,
+    type: "warning",
+    center: true
 
-    });
-    new Promise(resolve => {
+  });
+  new Promise(resolve => {
 
 
-        setTimeout(() => {
+    setTimeout(() => {
 
-            isShowSideBar.value = false;
-            resolve();
+      isShowSideBar.value = false;
+      resolve(0);
 
-        }, 2000);
+    }, 2000);
 
-    }).then(() => {
+  }).then(() => {
 
-        setTimeout(() => {
+    setTimeout(() => {
 
-            isShowTopBar.value = false;
+      isShowTopBar.value = false;
 
-        }, 800);
+    }, 800);
 
-    }).then(() => {
+  }).then(() => {
 
-        setTimeout(() => {
+    setTimeout(() => {
 
-            isShowPageTabs.value = false;
-            action();
+      isShowPageTabs.value = false;
+      action();
 
-        }, 1000);
+    }, 1000);
 
-    }).catch(err => {
+  }).catch(err => {
 
-        ElMessage.error("页面渲染错误");
-        console.log(err);
+    ElMessage.error("页面渲染错误");
+    console.log(err);
 
-    });
+  });
 
 }
 
@@ -164,6 +164,11 @@ function hideComponent(action: () => any) {
 </script>
 
 <style lang="scss" scoped>
+
+$topBar_height: 60px;
+$sideBar_width: 200px;
+$sideBar_height: calc(100vh - $topBar_height - 2 * 10px);
+$pageTabs_height: 80px;
 
 .main {
 
@@ -177,21 +182,50 @@ function hideComponent(action: () => any) {
   background-clip: border-box;
   background-size: cover;
 
-  > .main-sideBar {
+  .major-content {
 
-    width: 200px;
-
-  }
-
-  > .major-content {
-
-    flex: 1;
+    width: 100%;
     display: flex;
 
-    > .contentShowContainer {
+    .main-side-bar-container {
 
-      width: 100%;
-      height: 100%;
+      width: $sideBar_width;
+      height: $sideBar_height;
+      border-radius: 10px;
+      backdrop-filter: blur(50px);
+      margin: 10px 5px 10px 10px;
+
+    }
+
+    .main-content-container {
+
+      width: calc(100vw - $sideBar_width - 10px - 10px - 10px);
+      display: flex;
+      flex-direction: column;
+      align-content: center;
+      align-items: start;
+
+      .main-page-tabs-container {
+
+        width: 100%;
+        height: $pageTabs_height;
+        backdrop-filter: blur(50px);
+        margin: 10px 10px 5px 5px;
+        border-radius: 10px;
+
+      }
+
+      .main-content-show-container {
+
+        width: 100%;
+        max-height: calc(100vh - $topBar_height - 10px - $pageTabs_height - 10px - 10px);
+        border-radius: 10px;
+        flex-grow: 1;
+        margin: 5px 10px 10px 5px;
+        box-sizing: border-box;
+        overflow: auto;
+
+      }
 
     }
 

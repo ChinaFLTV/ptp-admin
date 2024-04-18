@@ -53,7 +53,7 @@
                 <h3 class="profileKey">用户头像</h3>
                 <el-image class="avatar" ref="avatarRef"
                           :src="userData?.avatar" alt="用户头像" @click="previewAvatar"
-                          fit="contain"/>
+                          fit="contain" lazy/>
                 <h3 class="profileKey">真实姓名</h3>
                 <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
                 <h3 class="profileKey">性别</h3>
@@ -113,7 +113,7 @@
 
 
 import {UserDataStore} from "@/store/user";
-import Administrator from "@/dao/Administrator";
+import Administrator from "@/entity/Administrator";
 import * as dayjs from "dayjs";
 import {desensitize} from "@/utils/desensitization";
 import {ImagePreview} from "@daxiazilong/image-preview";

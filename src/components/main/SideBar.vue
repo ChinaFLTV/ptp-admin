@@ -1,38 +1,18 @@
 <template>
 
+  <div class="side-bar-container">
 
-    <el-menu :active-text-color="primaryColor" default-active="1">
+    <div :class="{'active-side-bar-container':sideBarItem.name==navigateStore.currentOpenedPage.name}"
+         class="side-bar-item-container"
+         v-for="sideBarItem in sideBarItems"
+         :key="sideBarItem.name"
+         @click="clickSideTab(sideBarItem.title,sideBarItem.name,NavigationType.TAB_EXCHANGE)">
 
-        <el-menu-item index="1" :active-text-color="primaryColor"
-                      @click="clickSideTab('仪表盘','dashboard',NavigationType.DASHBOARD)">
-            <el-icon>
-                <Histogram/>
-            </el-icon>
-            <span class="menuItem">仪表盘</span>
-        </el-menu-item>
-        <el-menu-item class="menuItem" index="2" :active-text-color="primaryColor"
-                      @click="clickSideTab('数据管理','dataManage',NavigationType.DATA_MANAGE)">
-            <el-icon>
-                <DataAnalysis/>
-            </el-icon>
-            <span class="menuItem">数据管理</span>
-        </el-menu-item>
-        <el-menu-item class="menuItem" index="3" :active-text-color="primaryColor"
-                      @click="clickSideTab('人员管理','userManage',NavigationType.USER_MANAGE)">
-            <el-icon>
-                <UserFilled/>
-            </el-icon>
-            <span class="menuItem">人员管理</span>
-        </el-menu-item>
-        <el-menu-item class="menuItem" index="4" :active-text-color="primaryColor"
-                      @click="clickSideTab('版本控制','versionControl',NavigationType.VERSION_CONTROL)">
-            <el-icon>
-                <SetUp/>
-            </el-icon>
-            <span class="menuItem">版本控制</span>
-        </el-menu-item>
+      {{ sideBarItem.title }}
 
-    </el-menu>
+    </div>
+
+  </div>
 
 </template>
 
@@ -40,16 +20,48 @@
 <script lang="ts" setup>
 
 // 2024-2-6  22:29-主色调颜色
-import {DataAnalysis, Histogram, SetUp, UserFilled} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import {NavigationType} from "@/enums/NavigationType";
 import {NavigateStore} from "@/store/navigate";
 import randomUUID from "@/utils/uuid";
 import {ElMessage} from "element-plus";
+import {SideBarItem} from "@/entity/view/SideBarItem";
+import {Ref} from "vue";
 
-const primaryColor = "#ff0000";
 const router = useRouter();
 const navigateStore = NavigateStore();
+const sideBarItems: Ref<Array<SideBarItem>> = ref([
+
+  {
+
+    title: "仪表盘",
+    name: "dashboard",
+    icon: "Histogram"
+
+  },
+  {
+
+    title: "内容管理",
+    name: "contentManage",
+    icon: "DataAnalysis"
+
+  },
+  {
+
+    title: "人员管理",
+    name: "userManage",
+    icon: "UserFilled"
+
+  },
+  {
+
+    title: "版本控制",
+    name: "versionControl",
+    icon: "SetUp"
+
+  }
+
+]);
 
 /**
  *
@@ -64,42 +76,53 @@ const navigateStore = NavigateStore();
  */
 function clickSideTab(title: string, name: string, type: NavigationType) {
 
-    console.log("点击侧边栏选项卡");
-    router.push({
+  router.push({
 
-        name,
-        query: {
+    name,
+    query: {
 
-            type
+      type
 
-        }
+    }
 
-    }).catch(failure => {
+  }).catch(failure => {
 
-        if (failure) {
+    if (failure) {
 
-            ElMessage.error("导航失败：" + failure);
-            console.error(failure);
+      ElMessage.error("导航失败：" + failure);
+      console.error(failure);
 
-        } else {
+    }
 
-            const page = {
+  }).then(_ => {
 
-                title,
-                name,
-                path: `/main/content/${name.toLowerCase()}`,
-                id: randomUUID(),
-                draggable: true,
-                closeable: true,
-                cached: true
+    const page = {
 
-            };
-            navigateStore.openedPages.push(page);
-            navigateStore.currentOpenedPage = page;
+      title,
+      name,
+      path: `/main/content/${name.toLowerCase()}`,
+      id: randomUUID(),
+      openTime: new Date(),
+      draggable: true,
+      closeable: true,
+      cached: true
 
-        }
+    };
 
-    });
+    if (navigateStore.openedPages.filter(p => p.path == page.path).length > 0) {
+
+      // 2024-4-18  20:35-说明已经打开过相同标签，此时直接跳回已打开的相同标签
+      const index = navigateStore.openedPages.findIndex(p => p.path == page.path);
+      navigateStore.currentOpenedPage = navigateStore.openedPages[index];
+
+    } else {
+
+      navigateStore.openedPages.push(page);
+      navigateStore.currentOpenedPage = page;
+
+    }
+
+  });
 
 }
 
@@ -109,22 +132,34 @@ function clickSideTab(title: string, name: string, type: NavigationType) {
 
 <style lang="scss" scoped>
 
-@import "../../../public/css/global";
+@import "/public/css/global";
 
-.menuItem {
+.side-bar-container {
 
-  font-weight: bolder;
-  font-size: 1.1rem;
-  text-align: center;
-  color: $primaryColor;
+  height: 100%;
 
-}
+  .side-bar-item-container {
 
-.subMenuItem {
+    margin: 10px 10px;
+    border-radius: 10px;
+    background-color: antiquewhite;
+    height: 60px;
+    text-align: center;
+    line-height: 60px;
+    letter-spacing: 5px;
+    opacity: 0.7;
+    color: black;
 
-  font-weight: normal;
-  font-size: 0.8rem;
-  color: $primaryColor;
+  }
+
+  .active-side-bar-container {
+
+    font-weight: bolder;
+    background-color: #0D2266 !important; // 2024-4-18  20:18-添加!important以解决当前Tab处于选中状态时依旧响应hover样式从而使背景颜色改变
+    opacity: 1;
+    color: whitesmoke;
+
+  }
 
 }
 

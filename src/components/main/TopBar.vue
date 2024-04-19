@@ -1,53 +1,46 @@
 <template>
 
-  <div>
+  <div class="top-bar-container">
 
-    <el-menu class="topBarMenu"
-             mode="horizontal"
-             :ellipsis="false" background-color="#0D2266" text-color="#ffffff">
+    <img
+        class="logo-container"
+        src="../../assets/logo.svg"
+        alt="PTP LOGO"
+    />
 
-      <el-menu-item index="0" disabled>
-        <img
-            class="logo"
-            src="../../assets/logo.svg"
-            alt="PTP LOGO"
-            style="width: 60px"
-        />
-      </el-menu-item>
-      <div class="flex-grow"/>
-      <el-menu-item class="topBar-tab-text" @click="contactUsDialogVisible = true" index="1">与我们联系
-      </el-menu-item>
-      <el-menu-item>
-                <span ref="welcomeUserNameRef">{{
-                    userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
-                  }}</span>
-      </el-menu-item>
-      <el-menu-item>
-        <el-dropdown @command="clickDropDownMenuItem">
-          <el-avatar ref="avatarRef" :size="40" :src="avatarUrl"/>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item :command="0">个人信息</el-dropdown-item>
-              <el-dropdown-item :command="1">退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </el-menu-item>
+    <span class="web-name-text-container">PTP后台管理平台</span>
 
-    </el-menu>
+    <div class="flex-grow-spacer"/>
+
+    <span class="contact-us-container" @click="contactUsDialogVisible = true">与我们联系</span>
 
 
-    <!--  2024-1-16  22:33-不可见组件  -->
-    <el-dialog v-model="contactUsDialogVisible" title="联系我们" draggable center>
+    <el-tooltip
+        effect="dark"
+        :content="isFullscreen?'退出全屏':'全屏'"
+        placement="bottom"
+    >
+      <img v-if="!isFullscreen" @click="toggle" src="../../assets/icons/fullscreen.svg" class="fullscreen-container"
+           alt="Full Screen"/>
+      <img v-else @click="toggle" src="../../assets/icons/fullscreen-exit.svg" class="fullscreen-container"
+           alt="Full Screen Exit"/>
+    </el-tooltip>
 
-      <div class="dialog_content_contactUs">
+    <span class="welcome-text-container" ref="welcomeUserNameRef">{{
+        userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
+      }}</span>
 
-        <el-text type="primary">欢迎添加达哥QQ，与达哥一起探索编程世界！</el-text>
-        <el-image style="width:300px" :src="qq_qrcode" alt="达哥QQ二维码"/>
+    <el-dropdown @command="clickDropDownMenuItem">
+      <el-avatar class="user-avatar-container" ref="avatarRef" :size="40" :src="avatarUrl"/>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item :command="0">个人信息</el-dropdown-item>
+          <el-dropdown-item :command="1">退出登录</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
 
-      </div>
-
-    </el-dialog>
+    <ContactUsDialog v-model="contactUsDialogVisible"/>
 
   </div>
 
@@ -56,12 +49,12 @@
 
 <script lang="ts" setup>
 
-import qq_qrcode from "@/assets/image/qq_qrcode.jpg";
-
 import {ref} from "vue";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
 import {NavigationType} from "@/enums/NavigationType";
+import ContactUsDialog from "@/views/dialog/ContactUsDialog.vue";
+import {useFullscreen} from "@vueuse/core";
 
 
 const welcomeUserNameRef = ref(null);
@@ -72,6 +65,7 @@ const contactUsDialogVisible = ref(false);
 const avatarUrl = ref("src/assets/image/avatar_default.jpg");
 const router = useRouter();
 const userDataStore = UserDataStore();
+const {isFullscreen, toggle} = useFullscreen();
 
 
 const emits = defineEmits(["hideComponent"]);
@@ -161,29 +155,71 @@ defineExpose({
 
 <style lang="scss" scoped>
 
-.topBarMenu {
+.top-bar-container {
 
-  // 2024-2-10  15:48-消除el-menu默认border的宽约1px的留白
-  border: 0;
+  display: flex;
+  flex-direction: row;
+  backdrop-filter: blur(50px);
+  border-radius: 10px;
+  align-items: center;
 
-  > .topBar-tab-text {
 
-    font-weight: bolder;
+  .common-decor {
+
+    margin: 5px 10px;
+    color: black;
 
   }
 
-  > .flex-grow {
+  .logo-container {
 
+    @extend .common-decor;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+
+  }
+
+  .web-name-text-container {
+
+    margin: 5px 10px;
+    background-image: linear-gradient(145deg, red, blue) !important;
+    background-clip: text;
+    font-weight: bolder;
+    font-size: 1.5rem;
+
+  }
+
+  .flex-grow-spacer {
+
+    @extend .common-decor;
     flex-grow: 1;
 
   }
 
-  > .dialog_content_contactUs {
+  .contact-us-container {
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    @extend .common-decor;
+
+  }
+
+  .fullscreen-container {
+
+    @extend .common-decor;
+    width: 25px;
+    height: 25px;
+
+  }
+
+  .welcome-text-container {
+
+    @extend .common-decor;
+
+  }
+
+  .user-avatar-container {
+
+    @extend .common-decor;
 
   }
 

@@ -1,11 +1,11 @@
 <template>
 
-  <div class="main">
+  <div class="main-container">
 
     <transition name="el-zoom-in-top">
-      <TopBar v-show="isShowTopBar" ref="topBarRef" @hideComponent="hideComponent"/>
+      <TopBar class="main-top-bar-container" v-show="isShowTopBar" ref="topBarRef" @hideComponent="hideComponent"/>
     </transition>
-    <el-container class="major-content">
+    <el-container class="major-content-container">
 
       <transition name="el-zoom-in-bottom">
         <SideBar v-show="isShowSideBar" class="main-side-bar-container"/>
@@ -167,10 +167,11 @@ function hideComponent(action: () => any) {
 
 $topBar_height: 60px;
 $sideBar_width: 200px;
-$sideBar_height: calc(100vh - $topBar_height - 2 * 10px);
+$sideBar_height: calc(100vh - 10px - $topBar_height - 2 * 10px);
 $pageTabs_height: 80px;
+$content_height: calc(100vh - 10px - $topBar_height - 10px - $pageTabs_height - 10px - 10px);
 
-.main {
+.main-container {
 
   display: flex;
   flex-direction: column;
@@ -182,7 +183,15 @@ $pageTabs_height: 80px;
   background-clip: border-box;
   background-size: cover;
 
-  .major-content {
+  .main-top-bar-container {
+
+    height: $topBar_height;
+    margin: 10px 10px 5px 10px;
+    border-radius: 10px;
+
+  }
+
+  .major-content-container {
 
     width: 100%;
     display: flex;
@@ -193,7 +202,7 @@ $pageTabs_height: 80px;
       height: $sideBar_height;
       border-radius: 10px;
       backdrop-filter: blur(50px);
-      margin: 10px 5px 10px 10px;
+      margin: 5px 5px 10px 10px;
 
     }
 
@@ -210,7 +219,7 @@ $pageTabs_height: 80px;
         width: 100%;
         height: $pageTabs_height;
         backdrop-filter: blur(50px);
-        margin: 10px 10px 5px 5px;
+        margin: 5px 10px 5px 5px;
         border-radius: 10px;
 
       }
@@ -218,7 +227,7 @@ $pageTabs_height: 80px;
       .main-content-show-container {
 
         width: 100%;
-        max-height: calc(100vh - $topBar_height - 10px - $pageTabs_height - 10px - 10px);
+        max-height: $content_height;
         border-radius: 10px;
         flex-grow: 1;
         margin: 5px 10px 10px 5px;

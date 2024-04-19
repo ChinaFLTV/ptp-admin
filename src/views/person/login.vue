@@ -39,7 +39,6 @@
 <script setup lang="ts">
 
 
-import LwFireworks from "lw_firewords";
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
@@ -67,10 +66,6 @@ const loginData = ref({
   password: ""
 
 });
-
-// 2024-2-8  15:02-初始化鼠标点击出现烟花的效果的开源库
-const lw_f = new LwFireworks();//创建实例
-lw_f.init();//启动事件
 
 
 new Promise((resolve) => {
@@ -203,7 +198,7 @@ function login() {
     }).catch(err => {
 
       ElMessage.error("页面渲染错误");
-      console.log(err);
+      console.error(err);
 
     });
 

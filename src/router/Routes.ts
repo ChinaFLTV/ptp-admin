@@ -6,14 +6,14 @@
  * @description 标记主要的Route
  *
  */
-import Login from "@/views/person/login.vue";
-import MainPage from "@/components/main/MainPage.vue";
-import Profile from "@/views/person/Profile.vue";
-import Empty from "@/views/common/empty.vue";
-import DashBoard from "@/views/content/DashBoard.vue";
-import ContentManage from "@/views/content/ContentManage.vue";
-import UserManage from "@/views/content/UserManage.vue";
-import VersionControl from "@/views/content/VersionControl.vue";
+import Login from "@/layout/login/index.vue";
+import MainPage from "@/layout/content/MainPage.vue";
+import Profile from "@/layout/content/Profile.vue";
+import Empty from "@/components/status/empty/empty.vue";
+import DashBoard from "@/layout/content/DashBoard.vue";
+import ContentManage from "@/layout/content/ContentManage.vue";
+import UserManage from "@/layout/content/UserManage.vue";
+import VersionControl from "@/layout/content/VersionControl.vue";
 
 
 export const routes = [

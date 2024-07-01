@@ -8,10 +8,12 @@
  *
  */
 
-export  enum LogType {
+export enum LogType {
+
 
     LOGIN,
     LOGOUT,
     REGISTER
+
 
 }

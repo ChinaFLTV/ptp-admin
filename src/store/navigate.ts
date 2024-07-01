@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import randomUUID from "@/utils/uuid";
-import {Page} from "@/entity/page";
+import {Page} from "@/model/view/page";
 import {Ref} from "vue";
 
 export const NavigateStore = defineStore("navigateStore", {
@@ -17,7 +17,7 @@ export const NavigateStore = defineStore("navigateStore", {
             closeable: false,
             cached: true
 
-        }]);
+        } as Page]);
         const currentOpenedPage = ref(openedPages.value[0]);
 
         return {openedPages, currentOpenedPage};
@@ -37,7 +37,7 @@ export const NavigateStore = defineStore("navigateStore", {
          */
         removePage(id: number): number {
 
-            const index = this.openedPages.findIndex(page => page.id === id);
+            const index = this.openedPages.findIndex((page: Page) => page.id === id);
             this.openedPages.splice(index, 1);
             return index;
 

@@ -5,23 +5,23 @@ import App from "@/App.vue";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import * as VueRouter from "vue-router";
-import {createPinia} from "pinia";
+import {createPinia, Pinia} from "pinia";
 import {routes} from "@/router/Routes";
 import {NavigateStore} from "@/store/navigate";
 import randomUUID from "@/utils/uuid";
 import {NavigationType} from "@/enums/NavigationType";
-import {Page} from "@/entity/page";
+import {Page} from "@/model/view/page";
 // 导入中文
 import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 
 // @ts-ignore
-const app = createApp(App);
+const app: App<Element> = createApp(App);
 
 
 // 2024-2-7  15:24-每个路由都需要映射到一个组件
 // 2024-2-7  15:20-进行Vue路由初始化相关工作
-const router = VueRouter.createRouter({
+const router: VueRouter.Router = VueRouter.createRouter({
 
     // 2024-2-7  15:22-内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式
     history: VueRouter.createWebHashHistory(),
@@ -32,12 +32,12 @@ const router = VueRouter.createRouter({
 
 
 // 2024-2-8  21:41-初始化Pinia数据管理框架
-const pinia = createPinia();
+const pinia: Pinia = createPinia();
 app.use(pinia);
 
 
 const navigateStore = NavigateStore();
-router.beforeEach((to) => {
+router.beforeEach((to: VueRouter.RouteLocationNormalizedGeneric) => {
 
     switch (parseInt(to.query.type as string)) {
 

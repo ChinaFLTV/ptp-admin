@@ -6,7 +6,9 @@
  * @description 用于提供路由导航方式的枚举类型
  *
  */
+
 export enum NavigationType {
+
 
     TAB_EXCHANGE,
     TAB_CLOSE,
@@ -17,5 +19,6 @@ export enum NavigationType {
     CONTENT_MANAGE,
     USER_MANAGE,
     VERSION_CONTROL
+
 
 }

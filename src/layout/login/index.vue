@@ -10,20 +10,20 @@
         </transition>
         <transition name="el-zoom-in-bottom">
           <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
-                    placeholder="请输入账号"
+                    :placeholder="$t('login.accountPlaceholder')"
                     input-style="{background-color:transparent;color:antiquewhite;}"
                     v-model="loginData.account" clearable/>
         </transition>
         <transition name="el-zoom-in-bottom">
           <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
-                    placeholder="请输入密码"
+                    :placeholder="$t('login.passwordPlaceholder')"
                     input-style="{background-color:transparent;color:antiquewhite;}"
                     :show-password="true" v-model="loginData.password" clearable/>
         </transition>
         <transition name="el-zoom-in-bottom">
           <el-button :loading="isLoggingIn" :disabled="!isOperateForm" class="loginButton"
                      v-show="isShowLoginForm" type="primary"
-                     @click="login">登录
+                     @click="login">{{ $t("login.loginTitle") }}
           </el-button>
         </transition>
 
@@ -43,8 +43,8 @@ import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/user";
 import Administrator from "@/model/Administrator";
-import {service} from "@/http/service";
 import {NavigationType} from "@/enums/NavigationType";
+import {loginByAccountAndPassword} from "@/api/system/login";
 
 
 // 2024-2-8  15:10-是否显示登录对话框
@@ -113,21 +113,11 @@ function login() {
   }
 
 
-  service.get("/manage/administrator/get/single/byAccountAndPassword", {
+  loginByAccountAndPassword(loginData.value.account, loginData.value.password).then(response => {
 
-    params: {
-
-      account: loginData.value.account,
-      password: loginData.value.password
-
-    },
-    timeout: 5000
-
-  }).then(response => {
-
-    response = response.data;
+    // response = response.data;
     // @ts-ignore
-    if (response === null || response === undefined || response.code != 200) {
+    if (response === undefined || response.code != 200) {
 
       ElMessage({
 

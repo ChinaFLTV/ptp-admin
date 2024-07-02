@@ -8,6 +8,7 @@ import Components from "unplugin-vue-components/vite";
 import {ElementPlusResolver} from "unplugin-vue-components/resolvers";
 import Icons from "unplugin-icons/vite";
 import IconsResolver from "unplugin-icons/resolver";
+import {FileSystemIconLoader} from "unplugin-icons/loaders";
 
 
 // noinspection JSUnusedGlobalSymbols
@@ -31,7 +32,7 @@ export default defineConfig({
                 // 自动注册图标组件
                 IconsResolver({
 
-                    enabledCollections: ["ep"]
+                    enabledCollections: ["ep", "my"]
 
                 })
 
@@ -59,9 +60,17 @@ export default defineConfig({
 
 
         }),
+        // 2024-7-2  22:24-Iconify的详细使用说明 : https://www.cnblogs.com/lovewhatIlove/p/17196751.html
         Icons({
 
-            autoInstall: true
+            compiler: "vue3",
+            autoInstall: true,
+            customCollections: {
+
+                // 2024-7-2  22:23-使用规则是{prefix}-{my}-{add} , prefix没写默认是i , 如果prefix是false的话则是<my-add />、<myAdd />、 <MyAdd /> , my是设置在vite.config.js的集合名称 , add是目录里面的svg文件名称
+                "my": FileSystemIconLoader("./src/assets/icons", svg => svg.replace(/^<svg /, "<svg fill=\"currentColor\" "))
+
+            }
 
         })
 

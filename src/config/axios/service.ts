@@ -7,11 +7,12 @@
  *
  */
 import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from "axios";
+import {config} from "../web/config";
 
 export const service: AxiosInstance = axios.create({
 
-    baseURL: "http://119.45.0.82:8080", // 2024-7-1  18:17-基础服务地址 , 这个值会被添加到实际请求 URL 的前面
-    timeout: 5000, // 2024-7-1  18:17-超时时间 , 单位是毫秒
+    baseURL: config.base_url, // 2024-7-1  18:17-基础服务地址 , 这个值会被添加到实际请求 URL 的前面
+    timeout: config.request_timeout, // 2024-7-1  18:17-超时时间 , 单位是毫秒
     withCredentials: true // 2024-7-1  18:18-是否携带cookie发送跨域请求 , 默认为 false
 
 });

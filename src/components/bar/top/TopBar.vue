@@ -28,6 +28,23 @@
            alt="Full Screen Exit"/>
     </el-tooltip>
 
+    <el-tooltip
+        effect="dark"
+        content="语言切换"
+        placement="bottom"
+    >
+      <el-dropdown trigger="click">
+        <Icon icon="ooui:language" :width="24" :height="24" color="#000000"/>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <li v-for="locale in localeStore.availableLocales" :key="locale.id">
+              <el-dropdown-item>{{ locale.name }}</el-dropdown-item>
+            </li>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </el-tooltip>
+
     <span class="welcome-text-container" ref="welcomeUserNameRef">{{
         userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
       }}</span>
@@ -57,6 +74,8 @@ import {UserDataStore} from "@/store/user";
 import {NavigationType} from "@/enums/NavigationType";
 import ContactUsDialog from "@/components/dialog/ContactUsDialog.vue";
 import {useFullscreen} from "@vueuse/core";
+import {Icon} from "@iconify/vue";
+import {useLocaleStore} from "@/store/modules/locale";
 
 
 const welcomeUserNameRef = ref(null);
@@ -68,6 +87,7 @@ const avatarUrl = ref("src/assets/image/avatar_default.jpg");
 const router = useRouter();
 const userDataStore = UserDataStore();
 const {isFullscreen, toggle} = useFullscreen();
+const localeStore = useLocaleStore();
 
 
 const emits = defineEmits(["hideComponent"]);

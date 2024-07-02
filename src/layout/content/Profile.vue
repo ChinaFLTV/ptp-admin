@@ -117,7 +117,7 @@ import Administrator from "@/model/Administrator";
 import {desensitize} from "@/utils/desensitization";
 import {ImagePreview} from "@daxiazilong/image-preview";
 import {ElMessage} from "element-plus";
-import {service} from "@/http/service";
+import {service} from "@/config/axios/service";
 import {pcaTextArr} from "element-china-area-data";
 import * as dayjs from "dayjs";
 

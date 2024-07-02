@@ -16,5 +16,9 @@
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "types": [
+    "./src/types",
+    "unplugin-icons/types/vue"
   ]
 }

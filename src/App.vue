@@ -10,7 +10,7 @@
 <script setup lang="ts">
 
 import {useRouter} from "vue-router";
-import {UserDataStore} from "@/store/user";
+import {UserDataStore} from "@/store/modules/user";
 import LwFireworks from "lw_firewords";
 
 const router = useRouter();

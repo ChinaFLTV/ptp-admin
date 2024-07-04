@@ -39,7 +39,7 @@
 <script setup lang="ts">
 
 import {Close, Operation} from "@element-plus/icons-vue";
-import {NavigateStore} from "@/store/navigate";
+import {NavigateStore} from "@/store/modules/navigate";
 import {useRouter} from "vue-router";
 import {ElMessage} from "element-plus";
 import {NavigationType} from "@/enums/NavigationType";

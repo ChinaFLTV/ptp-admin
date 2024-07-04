@@ -9,36 +9,40 @@
     />
 
     <span class="web-name-text-container">
-      <a href="http://www.ptp.ink">PTP后台管理平台</a>
+      <a href="http://www.ptp.ink">{{ $t("common.bar.top.appTitle") }}</a>
     </span>
 
     <div class="flex-grow-spacer"/>
 
-    <span class="contact-us-container" @click="contactUsDialogVisible = true">与我们联系</span>
+    <span class="contact-us-container"
+          @click="contactUsDialogVisible = true">{{ $t("common.bar.top.contactUs") }}</span>
 
 
     <el-tooltip
         effect="dark"
-        :content="isFullscreen?'退出全屏':'全屏'"
+        :content="isFullscreen?$t('common.bar.top.exitFullscreen'):$t('common.bar.top.enterFullscreen')"
         placement="bottom"
     >
       <img v-if="!isFullscreen" @click="toggle" src="../../../assets/icons/fullscreen.svg" class="fullscreen-container"
-           alt="Full Screen"/>
+           :alt="$t('common.bar.top.enterFullscreen')"/>
       <img v-else @click="toggle" src="../../../assets/icons/fullscreen-exit.svg" class="fullscreen-container"
-           alt="Full Screen Exit"/>
+           :alt="$t('common.bar.top.exitFullscreen')"/>
     </el-tooltip>
 
     <el-tooltip
         effect="dark"
-        content="语言切换"
+        :content="$t('common.bar.top.changeLanguage')"
         placement="bottom"
     >
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" @command="changeLanguage">
         <Icon icon="ooui:language" :width="24" :height="24" color="#000000"/>
         <template #dropdown>
           <el-dropdown-menu>
             <li v-for="locale in localeStore.availableLocales" :key="locale.id">
-              <el-dropdown-item>{{ locale.name }}</el-dropdown-item>
+              <el-dropdown-item :command="locale"
+                                :style="{color:(localeStore.currentLocaleId===locale.id)?'#409eff':'#606266'}">
+                {{ locale.name }}
+              </el-dropdown-item>
             </li>
           </el-dropdown-menu>
         </template>
@@ -46,15 +50,18 @@
     </el-tooltip>
 
     <span class="welcome-text-container" ref="welcomeUserNameRef">{{
-        userDataStore.localUserData == null ? "请登录" : `欢迎你，${userDataStore.localUserData.nickname}`
+
+        //// 2024-7-4  16:36-先临时采用字符串拼接的形式完成欢迎标语的国际化(不知道咋了,字符串格式化就是总是出问题)
+        userDataStore.localUserData == null ? $t("common.bar.top.enterLogin") : $t("common.bar.top.welcome", {nickname: userDataStore.localUserData.nickname})
+
       }}</span>
 
     <el-dropdown @command="clickDropDownMenuItem">
       <el-avatar class="user-avatar-container" ref="avatarRef" :size="40" :src="avatarUrl"/>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item :command="0">个人信息</el-dropdown-item>
-          <el-dropdown-item :command="1">退出登录</el-dropdown-item>
+          <el-dropdown-item :command="0">{{ $t("common.bar.top.profile") }}</el-dropdown-item>
+          <el-dropdown-item :command="1">{{ $t("common.bar.top.exitLogin") }}</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -70,12 +77,14 @@
 
 import {ref} from "vue";
 import {useRouter} from "vue-router";
-import {UserDataStore} from "@/store/user";
+import {UserDataStore} from "@/store/modules/user";
 import {NavigationType} from "@/enums/NavigationType";
 import ContactUsDialog from "@/components/dialog/ContactUsDialog.vue";
 import {useFullscreen} from "@vueuse/core";
 import {Icon} from "@iconify/vue";
-import {useLocaleStore} from "@/store/modules/locale";
+import {Locale, useLocaleStore} from "@/store/modules/locale";
+import {useLocale} from "@/hooks/web/useLocale";
+import {i18n} from "@/plugins/vueI18n";
 
 
 const welcomeUserNameRef = ref(null);
@@ -91,6 +100,9 @@ const localeStore = useLocaleStore();
 
 
 const emits = defineEmits(["hideComponent"]);
+const {changeLocale} = useLocale();
+
+const {t} = i18n.global;
 
 
 // 2024-2-7  16:18-登录登出回调函数
@@ -158,12 +170,36 @@ function updateComponentStatus() {
   if (userData !== null) {
 
     console.log("更新顶栏组件状态为登录状态");
-    welcomeUserNameRef.value.innerHTML = `欢迎你，${userData.nickname}`;
+    welcomeUserNameRef.value.innerHTML = t("common.bar.top.welcome", {nickname: userDataStore.localUserData.nickname});
     avatarUrl.value = userData.avatar;
 
   }
 
 }
+
+
+/**
+ *
+ * @author Lenovo
+ * @date 2024/7/3 PM 8:11:25
+ * @filename TopBar.vue
+ * @param newLocale 新更换的区域语言设置
+ * @description 更改应用语言
+ *
+ */
+function changeLanguage(newLocale: Locale) {
+
+  // 2024-7-3  20:13-如果切换前后的语言一致 , 则不做任何处理
+  if (localeStore.currentLocaleId == newLocale.id)
+    return;
+
+  changeLocale(newLocale.id);
+
+  // 需要重新加载页面让整个语言多初始化
+  window.location.reload();
+
+}
+
 
 defineExpose({
 

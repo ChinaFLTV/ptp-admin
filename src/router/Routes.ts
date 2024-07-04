@@ -14,6 +14,9 @@ import DashBoard from "@/layout/content/DashBoard.vue";
 import ContentManage from "@/layout/content/ContentManage.vue";
 import UserManage from "@/layout/content/UserManage.vue";
 import VersionControl from "@/layout/content/VersionControl.vue";
+import {useI18n} from "@/hooks/web/useI18n";
+
+const { t } = useI18n()
 
 
 export const routes = [
@@ -70,7 +73,7 @@ export const routes = [
                         component: DashBoard,
                         meta: {
 
-                            title: "仪表盘"
+                            title: t("common.bar.side.dashboard")
 
                         }
 
@@ -81,7 +84,7 @@ export const routes = [
                         component: ContentManage,
                         meta: {
 
-                            title: "数据管理"
+                            title: t("common.bar.side.contentManage")
 
                         }
 
@@ -92,7 +95,7 @@ export const routes = [
                         component: UserManage,
                         meta: {
 
-                            title: "用户管理"
+                            title: t("common.bar.side.userManage")
 
                         }
 
@@ -103,7 +106,7 @@ export const routes = [
                         component: VersionControl,
                         meta: {
 
-                            title: "版本控制"
+                            title: t("common.bar.side.versionControl")
 
                         }
 
@@ -123,7 +126,7 @@ export const routes = [
         component: Login,
         meta: {
 
-            title: "用户登录"
+            title: t("login.loginTitle")
 
         }
 

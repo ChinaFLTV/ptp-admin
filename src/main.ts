@@ -6,7 +6,7 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import * as VueRouter from "vue-router";
 import {routes} from "@/router/Routes";
-import {NavigateStore} from "@/store/navigate";
+import {NavigateStore} from "@/store/modules/navigate";
 import randomUUID from "@/utils/uuid";
 import {NavigationType} from "@/enums/NavigationType";
 import {Page} from "@/model/view/page";
@@ -15,6 +15,7 @@ import {Page} from "@/model/view/page";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import {setI18n} from "@/plugins/vueI18n";
 import {setupStore} from "@/store";
+import {setupCustomDirectives} from "@/directives";
 
 
 const app = createApp(App);
@@ -28,7 +29,13 @@ const app = createApp(App);
  * @description 配置APP插件
  *
  */
-async function configPlugins() {
+function configPlugins() {
+
+    // 2024-2-8  21:41-初始化Pinia数据管理框架
+    setupStore(app);
+
+    // 2024-7-4  17:51-设置自定义Vue指令
+    setupCustomDirectives(app);
 
     // 2024-2-7  15:24-每个路由都需要映射到一个组件
     // 2024-2-7  15:20-进行Vue路由初始化相关工作
@@ -40,10 +47,6 @@ async function configPlugins() {
         routes
 
     });
-
-
-    // 2024-2-8  21:41-初始化Pinia数据管理框架
-    setupStore(app);
 
 
     const navigateStore = NavigateStore();
@@ -114,7 +117,7 @@ async function configPlugins() {
     //app.component("v-distpicker", Distpicker);
 
     // 2024-7-2  18:53-配置语言国际化
-    await setI18n(app);
+    setI18n(app);
 
     app.mount("#main-area");
 

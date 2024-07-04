@@ -2,7 +2,8 @@
 
   <div class="side-bar-container">
 
-    <div :class="{'active-side-bar-container':sideBarItem.name==navigateStore.currentOpenedPage.name}"
+    <div v-adjustFontSize="180"
+         :class="{'active-side-bar-container':sideBarItem.name==navigateStore.currentOpenedPage.name}"
          class="side-bar-item-container"
          v-for="sideBarItem in sideBarItems"
          :key="sideBarItem.name"
@@ -22,11 +23,14 @@
 // 2024-2-6  22:29-主色调颜色
 import {useRouter} from "vue-router";
 import {NavigationType} from "@/enums/NavigationType";
-import {NavigateStore} from "@/store/navigate";
+import {NavigateStore} from "@/store/modules/navigate";
 import randomUUID from "@/utils/uuid";
 import {ElMessage} from "element-plus";
 import {SideBarItem} from "@/model/view/SideBarItem";
 import {Ref} from "vue";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 const router = useRouter();
 const navigateStore = NavigateStore();
@@ -34,28 +38,28 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
 
   {
 
-    title: "仪表盘",
+    title: t("common.bar.side.dashboard"),
     name: "dashboard",
     icon: "Histogram"
 
   },
   {
 
-    title: "内容管理",
+    title: t("common.bar.side.contentManage"),
     name: "contentManage",
     icon: "DataAnalysis"
 
   },
   {
 
-    title: "人员管理",
+    title: t("common.bar.side.userManage"),
     name: "userManage",
     icon: "UserFilled"
 
   },
   {
 
-    title: "版本控制",
+    title: t("common.bar.side.versionControl"),
     name: "versionControl",
     icon: "SetUp"
 

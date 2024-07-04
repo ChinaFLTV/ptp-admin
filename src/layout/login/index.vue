@@ -41,7 +41,7 @@
 
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
-import {UserDataStore} from "@/store/user";
+import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
 import {NavigationType} from "@/enums/NavigationType";
 import {loginByAccountAndPassword} from "@/api/system/login";

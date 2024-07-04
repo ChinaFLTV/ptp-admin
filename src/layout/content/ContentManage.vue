@@ -52,7 +52,7 @@
 <script setup lang="ts">
 
 
-import {ContentStore} from "@/store/content";
+import {ContentStore} from "@/store/modules/content";
 import Passage from "@/model/passage";
 import {Ref} from "vue";
 

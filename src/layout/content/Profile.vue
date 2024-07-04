@@ -112,7 +112,7 @@
 <script setup lang="ts">
 
 
-import {UserDataStore} from "@/store/user";
+import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
 import {desensitize} from "@/utils/desensitization";
 import {ImagePreview} from "@daxiazilong/image-preview";

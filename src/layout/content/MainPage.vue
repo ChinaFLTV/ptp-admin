@@ -34,7 +34,7 @@ import TopBar from "@/components/bar/top/TopBar.vue";
 import {onMounted} from "vue";
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
-import {UserDataStore} from "@/store/user";
+import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
 
 

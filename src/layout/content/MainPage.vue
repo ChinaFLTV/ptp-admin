@@ -36,7 +36,9 @@ import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
+import {useI18n} from "vue-i18n";
 
+const {t} = useI18n();
 
 const topBarRef = ref(null);
 
@@ -90,7 +92,7 @@ new Promise(resolve => {
 
 }).catch(err => {
 
-  ElMessage.error("页面渲染错误");
+  ElMessage.error(t("common.message.pageRenderError"));
   console.log(err);
 
 });
@@ -118,7 +120,7 @@ function hideComponent(action: () => any) {
 
   ElMessage({
 
-    message: "正在登出...",
+    message: t("common.message.logout"),
     showClose: true,
     type: "warning",
     center: true

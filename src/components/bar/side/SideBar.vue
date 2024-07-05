@@ -2,7 +2,7 @@
 
   <div class="side-bar-container">
 
-    <div v-adjustFontSize="180"
+    <div v-adjustFontSize="160"
          :class="{'active-side-bar-container':sideBarItem.name==navigateStore.currentOpenedPage.name}"
          class="side-bar-item-container"
          v-for="sideBarItem in sideBarItems"
@@ -93,7 +93,7 @@ function clickSideTab(title: string, name: string, type: NavigationType) {
 
     if (failure) {
 
-      ElMessage.error("导航失败：" + failure);
+      ElMessage.error(t("common.message.navigationFailure") + " : " + failure);
       console.error(failure);
 
     }

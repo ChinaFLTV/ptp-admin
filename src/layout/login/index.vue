@@ -45,7 +45,9 @@ import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
 import {NavigationType} from "@/enums/NavigationType";
 import {loginByAccountAndPassword} from "@/api/system/login";
+import {useI18n} from "vue-i18n";
 
+const {t} = useI18n();
 
 // 2024-2-8  15:10-是否显示登录对话框
 const isShowLoginBox = ref(false);
@@ -87,7 +89,7 @@ new Promise((resolve) => {
 
 }).catch(err => {
 
-  ElMessage.error("页面渲染错误");
+  ElMessage.error(t("common.message.pageRenderError"));
   console.log(err);
 
 });
@@ -100,7 +102,7 @@ function login() {
 
     ElMessage({
 
-      message: "信息不完整",
+      message: t("common.message.incompleteInformation"),
       showClose: true,
       type: "error",
       center: true
@@ -121,7 +123,7 @@ function login() {
 
       ElMessage({
 
-        message: "登录出错",
+        message: t("login.message.loginError"),
         showClose: true,
         type: "error",
         center: true
@@ -135,7 +137,7 @@ function login() {
 
       ElMessage({
 
-        message: "账号或密码不正确",
+        message: t("login.message.incorrectInformation"),
         showClose: true,
         type: "error",
         center: true
@@ -149,7 +151,7 @@ function login() {
 
     ElMessage({
 
-      message: "校验通过，请稍后",
+      message: t("login.message.checkPass"),
       showClose: true,
       type: "success",
       center: true
@@ -187,7 +189,7 @@ function login() {
 
     }).catch(err => {
 
-      ElMessage.error("页面渲染错误");
+      ElMessage.error(t("common.message.pageRenderError"));
       console.error(err);
 
     });

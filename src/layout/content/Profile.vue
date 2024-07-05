@@ -2,23 +2,24 @@
 
   <div class="userProfileContainer">
 
-    <h1 class="profileTitle">用户信息</h1>
+    <h1 class="profileTitle">{{ $t("common.bar.top.profile") }}</h1>
     <div style="display: flex;">
       <div class="halfProfileArea">
 
-        <h3 class="profileKey">用户唯一ID</h3>
+        <h3 class="profileKey">{{ $t("content.profile.id") }}</h3>
         <p class="profileValue">{{ userData?.id }}</p>
-        <h3 class="profileKey">账号信息</h3>
+        <h3 class="profileKey">{{ $t("content.profile.account") }}</h3>
         <p class="profileValue">{{ userData?.account }}</p>
-        <h3 class="profileKey">密码</h3>
+        <h3 class="profileKey">{{ $t("content.profile.password") }}</h3>
         <p class="profileValue" style="display: inline-block">{{ desensitize(userData?.password, "*", 0) }}</p>
-        <span class="modify" @click="isShowModifyPasswordDialog = true">修改密码</span>
-        <h3 class="profileKey">用户昵称</h3>
+        <span class="modify"
+              @click="isShowModifyPasswordDialog = true">{{ $t("content.profile.changePassword") }}</span>
+        <h3 class="profileKey">{{ $t("content.profile.nickname") }}</h3>
         <p class="profileValue" style="display: inline-block">{{ userData?.nickname }}</p>
-        <span class="modify" @click="isShowRenameDialog = true">修改昵称</span>
-        <h3 class="profileKey">注册时间</h3>
+        <span class="modify" @click="isShowRenameDialog = true">{{ $t("content.profile.changeNickname") }}</span>
+        <h3 class="profileKey">{{ $t("content.profile.registerDate") }}</h3>
         <p class="profileValue">{{ dayjs(userData?.registerDate).format("YYYY年M月D日 HH:mm:ss") }}</p>
-        <h3 class="profileKey">家庭住址</h3>
+        <h3 class="profileKey">{{ $t("content.profile.homeAddress") }}</h3>
         <transition name="el-fade-in-linear">
           <div v-show="isShowUserAddress">
 
@@ -27,7 +28,9 @@
                 (JSON.parse(userData?.address) as string[])?.join(" ")
               }}</p>
             <span class="modify"
-                  @click="isShowUserAddress = false;isShowModifyAddressArea = true;address = JSON.parse(userData.address) as string[]">修改地址</span>
+                  @click="isShowUserAddress = false;isShowModifyAddressArea = true;address = JSON.parse(userData.address) as string[]">{{
+                $t("content.profile.changeHomeAddress")
+              }}</span>
 
           </div>
         </transition>
@@ -37,12 +40,12 @@
 
             <el-cascader
                 size="large"
-                :options="pcaTextArr" v-model="address">
+                :options="pcaTextArr as CascaderOption[]" v-model="address">
             </el-cascader>
             <el-button @click="isShowUserAddress = true;isShowModifyAddressArea = false;"
-                       style="margin-left: 3rem">取消
+                       style="margin-left: 3rem">{{ $t("common.button.cancel") }}
             </el-button>
-            <el-button type="primary" @click="submitModifyAddress">确定</el-button>
+            <el-button type="primary" @click="submitModifyAddress">{{ $t("common.button.confirm") }}</el-button>
 
           </div>
         </transition>
@@ -50,17 +53,17 @@
       </div>
       <div class="halfProfileArea">
 
-        <h3 class="profileKey">用户头像</h3>
+        <h3 class="profileKey">{{ $t("content.profile.avatar") }}</h3>
         <el-image class="avatar" ref="avatarRef"
-                  :src="userData?.avatar" alt="用户头像" @click="previewAvatar"
+                  :src="userData?.avatar" :alt="t('content.profile.avatar')" @click="previewAvatar"
                   fit="contain" lazy/>
-        <h3 class="profileKey">真实姓名</h3>
+        <h3 class="profileKey">{{ $t("content.profile.realname") }}</h3>
         <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
-        <h3 class="profileKey">性别</h3>
+        <h3 class="profileKey">{{ $t("content.profile.sex") }}</h3>
         <p class="profileValue">{{
-            userData?.sex === "male" ? "男" : userData?.sex === "female" ? "女" : "保密"
+            userData?.sex === "male" ? $t("content.profile.sex_male") : userData?.sex === "female" ? $t("content.profile.sex_female") : $t("content.profile.sex_secret")
           }}</p>
-        <h3 class="profileKey">信誉积分</h3>
+        <h3 class="profileKey">{{ $t("content.profile.credit") }}</h3>
         <p ref="creditRef" class="profileValue"
            style="display:inline-block;width: auto;padding: 4px 10px 4px 10px;border-radius: 5px">
           {{ userData?.credit }}</p>
@@ -70,35 +73,35 @@
     </div>
 
 
-    <el-dialog v-model="isShowRenameDialog" title="修改用户昵称" width="500">
+    <el-dialog v-model="isShowRenameDialog" :title="t('content.profile.changeNickname')" width="500">
 
       <el-input ref="newNicknameRef" v-model="newNickname" :minlength="2" :maxlength="15"
-                placeholder="请输入新的昵称" clearable
+                :placeholder="t('content.profile.nicknameInputPlaceholder')" clearable
                 show-word-limit/>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="isShowRenameDialog = false">取消</el-button>
-          <el-button type="primary" @click="submitRename">确定</el-button>
+          <el-button @click="isShowRenameDialog = false">{{ $t("common.button.cancel") }}</el-button>
+          <el-button type="primary" @click="submitRename">{{ $t("common.button.confirm") }}</el-button>
         </div>
       </template>
 
     </el-dialog>
 
-    <el-dialog v-model="isShowModifyPasswordDialog" title="修改密码" width="500">
+    <el-dialog v-model="isShowModifyPasswordDialog" :title="t('content.profile.changePassword')" width="500">
 
-      <p class="modifyPasswordLabel">旧密码:</p>
+      <p class="modifyPasswordLabel">{{ $t("content.profile.oldPassword") }}:</p>
       <el-input ref="newNicknameRef" v-model="oldPassword" type="password"
-                placeholder="请输入旧密码" clearable/>
-      <p class="modifyPasswordLabel">新密码:</p>
+                :placeholder="t('content.profile.oldPasswordInputPlaceholder')" clearable/>
+      <p class="modifyPasswordLabel">{{ $t("content.profile.newPassword") }}:</p>
       <el-input ref="newNicknameRef" v-model="newPassword" type="password"
-                placeholder="请输入新密码" clearable/>
-      <p class="modifyPasswordLabel">再次确认新密码:</p>
+                :placeholder="t('content.profile.newPasswordInputPlaceholder')" clearable/>
+      <p class="modifyPasswordLabel">{{ $t("content.profile.confirmPassword") }}:</p>
       <el-input ref="newNicknameRef" v-model="newPasswordAgain" type="password"
-                placeholder="请重复新密码" clearable/>
+                :placeholder="t('content.profile.confirmPasswordInputPlaceholder')" clearable/>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="isShowModifyPasswordDialog = false">取消</el-button>
-          <el-button type="primary" @click="submitModifyPassword">确定</el-button>
+          <el-button @click="isShowModifyPasswordDialog = false">{{ $t("common.button.cancel") }}</el-button>
+          <el-button type="primary" @click="submitModifyPassword">{{ $t("common.button.confirm") }}</el-button>
         </div>
       </template>
 
@@ -119,7 +122,11 @@ import {ImagePreview} from "@daxiazilong/image-preview";
 import {ElMessage} from "element-plus";
 import {service} from "@/config/axios/service";
 import {pcaTextArr} from "element-china-area-data";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
+import {CascaderOption} from "element-plus/lib/components";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 
 
 const avatarRef = ref(null);
@@ -184,8 +191,6 @@ onUnmounted(() => {
  */
 function previewAvatar() {
 
-  console.log("开始预览头像图片");
-  console.log(userData.value.avatar);
   imagePreview = new ImagePreview({
 
     imgs: [userData.value.avatar]
@@ -208,17 +213,17 @@ function submitRename() {
 
   if (newNickname.value === "") {
 
-    ElMessage.error("昵称不能为空~");
+    ElMessage.error(t("content.profile.message.nicknameCannotBeEmpty"));
     return;
 
   } else if (newNickname.value.length < 2) {
 
-    ElMessage.error("用户昵称不能少于两个字符~");
+    ElMessage.error(t("content.profile.message.nicknameIsIllegal"));
     return;
 
   } else if (newNickname.value === userData.value.nickname) {
 
-    ElMessage.warning("新昵称与旧昵称相同，无需修改~");
+    ElMessage.warning(t("content.profile.message.newNicknameIsTheSameAsOldNickname"));
     return;
 
   } else {
@@ -233,7 +238,7 @@ function submitRename() {
 
           ElMessage({
 
-            message: "修改昵称成功",
+            message: t("content.profile.message.modifyNicknameSucceeded"),
             showClose: true,
             type: "success",
             center: true
@@ -242,11 +247,10 @@ function submitRename() {
           userDataStore.updateUserData(userData.value);
           newNickname.value = "" as string;
 
-
         }).catch(err => {
 
       console.log(err);
-      ElMessage.error("更新昵称失败");
+      ElMessage.error(t("content.profile.message.modifyNicknameFailed"));
       userData.value.nickname = oldNickname;
       userDataStore.updateUserData(userData.value);
       newNickname.value = "" as string;
@@ -270,28 +274,28 @@ function submitModifyPassword() {
 
   if (oldPassword.value === "" || newPassword.value === "" || newPasswordAgain.value === "") {
 
-    ElMessage.error("信息不完整");
+    ElMessage.error(t("common.message.incompleteInformation"));
     return;
 
   }
 
   if (userData.value.password !== oldPassword.value) {
 
-    ElMessage.error("旧密码填写错误");
+    ElMessage.error(t("content.profile.message.wrongOldPassword"));
     return;
 
   }
 
   if (newPassword.value !== newPasswordAgain.value) {
 
-    ElMessage.error("前后两次填写的新密码不一致");
+    ElMessage.error(t("content.profile.message.differentTwoNewPassword"));
     return;
 
   }
 
   if (oldPassword.value === newPassword.value) {
 
-    ElMessage.error("新密码不能与旧密码相同");
+    ElMessage.error(t("content.profile.message.newPasswordIsTheSameAsOldPassword"));
     return;
 
   }
@@ -302,7 +306,7 @@ function submitModifyPassword() {
 
         ElMessage({
 
-          message: "修改密码成功",
+          message: t("content.profile.message.modifyPasswordSucceeded"),
           showClose: true,
           type: "success",
           center: true
@@ -317,7 +321,7 @@ function submitModifyPassword() {
       }).catch(err => {
 
     console.log(err);
-    ElMessage.error("更新密码失败");
+    ElMessage.error(t("content.profile.message.modifyPasswordFailed"));
 
     userData.value.password = oldPassword.value;
     oldPassword.value = "" as string;
@@ -344,7 +348,7 @@ function submitModifyAddress() {
 
   if (userData.value.address === JSON.stringify(address.value)) {
 
-    ElMessage.warning("前后地址相同，无需修改~");
+    ElMessage.warning(t("content.profile.message.newHomeAddressIsTheSameAsOldHomeAddress"));
     return;
 
   }
@@ -357,7 +361,7 @@ function submitModifyAddress() {
 
         ElMessage({
 
-          message: "修改地址成功",
+          message: t("content.profile.message.modifyHomeAddressSucceeded"),
           showClose: true,
           type: "success",
           center: true
@@ -370,7 +374,7 @@ function submitModifyAddress() {
       }).catch(err => {
 
     console.log(err);
-    ElMessage.error("更新地址失败");
+    ElMessage.error(t("content.profile.message.modifyHomeAddressFailed"));
 
     userData.value.address = oldAddress;
     userDataStore.updateUserData(userData.value);

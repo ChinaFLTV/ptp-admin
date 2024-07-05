@@ -9,6 +9,7 @@
  *
  */
 import {App} from "vue";
+import {measureFontSize, measureText} from "@/utils/measure";
 
 export function adjustFontSize(app: App<Element>) {
 
@@ -22,21 +23,24 @@ export function adjustFontSize(app: App<Element>) {
             // 2024-7-4  20:12-获取当前元素的最终style(包括内联style、嵌入style、外部style)(只读)
             const elStyle: CSSStyleDeclaration = window.getComputedStyle(el);
 
-            const maxLength = binding.value;
-            const text = el.innerText;
+            const maxLength: number = binding.value;
+            const text: string = el.innerText;
             const fontSize: number = Number(elStyle.fontSize.substring(0, elStyle.fontSize.length - 2));
+            const letterSpacing: number = Number(elStyle.letterSpacing.substring(0, elStyle.letterSpacing.length - 2));
             // 2024-7-4  20:51-获取设备密度
             // const deviceDensity: number = window.devicePixelRatio || 1;
 
             if (maxLength) {
 
+                // 2024-7-5  15:34-不能简单地采用 textLength * fontSize 的方式进行计算 , 这样计算出的文字长度不准确 , 需要采用Canvas的measureText API进行测量
                 //// 2024-7-4  20:36-px => sp的计算公式 : px = sp * 屏幕密度 / 160
-                const textLength = text.length * fontSize;
+                const textLength = measureText(text, fontSize, elStyle.fontFamily, letterSpacing);
+                // const textLength = text.length * fontSize;
                 if (textLength > maxLength) {
 
-                    const newFontSize = maxLength / text.length;
-                    el.style.fontSize = newFontSize + "px";
                     el.style.letterSpacing = "1px";
+                    const newFontSize: number = measureFontSize(text, maxLength, elStyle.fontFamily, 1);
+                    el.style.fontSize = newFontSize + "px";
 
                 }
 

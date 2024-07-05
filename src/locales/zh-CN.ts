@@ -36,6 +36,20 @@ export default {
 
             }
 
+        },
+        button: {
+
+            confirm: "确认",
+            cancel: "取消"
+
+        },
+        message: {
+
+            pageRenderError: "页面渲染错误",
+            navigationFailure: "导航失败",
+            logout: "正在登出...",
+            incompleteInformation: "信息不完整"
+
         }
 
     },
@@ -44,7 +58,62 @@ export default {
 
         loginTitle: "登录",
         accountPlaceholder: "请输入账号",
-        passwordPlaceholder: "请输入密码"
+        passwordPlaceholder: "请输入密码",
+        message: {
+
+            incorrectInformation: "账号或密码不正确",
+            loginError: "登录出错",
+            checkPass: "校验通过，请稍后"
+
+        }
+
+    },
+    content: {
+
+        profile: {
+
+            id: "用户唯一ID",
+            account: "账号信息",
+            password: "密码",
+            changePassword: "修改密码",
+            oldPassword: "旧密码",
+            newPassword: "新密码",
+            confirmPassword: "再次确认新密码",
+            oldPasswordInputPlaceholder: "请输入旧密码",
+            newPasswordInputPlaceholder: "请输入新密码",
+            confirmPasswordInputPlaceholder: "请重复新密码",
+            nickname: "用户昵称",
+            changeNickname: "修改昵称",
+            nicknameInputPlaceholder: "请输入新的昵称",
+            registerDate: "注册时间",
+            homeAddress: "家庭住址",
+            changeHomeAddress: "修改地址",
+            avatar: "用户头像",
+            realname: "真实姓名",
+            sex: "性别",
+            sex_male: "男",
+            sex_female: "女",
+            sex_secret: "保密",
+            credit: "信誉积分",
+            message: {
+
+                nicknameCannotBeEmpty: "昵称不能为空~",
+                nicknameIsIllegal: "用户昵称不能少于两个字符~",
+                newNicknameIsTheSameAsOldNickname: "新昵称与旧昵称相同",
+                modifyNicknameSucceeded: "修改昵称成功",
+                modifyNicknameFailed: "修改昵称失败",
+                wrongOldPassword: "旧密码填写错误",
+                differentTwoNewPassword: "前后两次填写的新密码不一致",
+                newPasswordIsTheSameAsOldPassword: "新密码与旧密码相同",
+                modifyPasswordSucceeded: "修改密码成功",
+                modifyPasswordFailed: "修改密码失败",
+                newHomeAddressIsTheSameAsOldHomeAddress: "新地址与旧地址相同",
+                modifyHomeAddressSucceeded: "修改地址成功",
+                modifyHomeAddressFailed: "修改地址失败"
+
+            }
+
+        }
 
     }
 

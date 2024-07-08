@@ -76,7 +76,6 @@ const localeStore = defineStore("locale", {
          */
         updateCurrentLocale(newLocaleId: LocaleType) {
 
-            console.log("修改语言到", newLocaleId);
             const newLocale: Locale = this.getLocaleById(newLocaleId);
             wsCache.set(CACHE_KEY.LOCALE, newLocaleId);
             this.currentLocale = newLocale;

@@ -55,8 +55,13 @@
 
         <h3 class="profileKey">{{ $t("content.profile.avatar") }}</h3>
         <el-image class="avatar" ref="avatarRef"
-                  :src="userData?.avatar" :alt="t('content.profile.avatar')" @click="previewAvatar"
-                  fit="contain" lazy/>
+                  :src="userData?.avatar" :alt="t('content.profile.avatar')"
+                  :zoom-rate="1.2"
+                  :max-scale="7"
+                  :min-scale="0.2"
+                  :preview-src-list="[userData?.avatar]"
+                  :initial-index="0"
+                  fit="cover" lazy/>
         <h3 class="profileKey">{{ $t("content.profile.realname") }}</h3>
         <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
         <h3 class="profileKey">{{ $t("content.profile.sex") }}</h3>
@@ -118,7 +123,6 @@
 import {UserDataStore} from "@/store/modules/user";
 import Administrator from "@/model/Administrator";
 import {desensitize} from "@/utils/desensitization";
-import {ImagePreview} from "@daxiazilong/image-preview";
 import {ElMessage} from "element-plus";
 import {service} from "@/config/axios/service";
 import {pcaTextArr} from "element-china-area-data";
@@ -137,7 +141,6 @@ const newNicknameRef = ref(null);
 const userDataStore = UserDataStore();
 // 2024-2-11  10:57-能够进入当前页面，则用户一定已经登录了
 const userData = ref(userDataStore.getUserData() as Administrator);
-let imagePreview: ImagePreview = null as ImagePreview;
 const isShowRenameDialog = ref(false);
 const newNickname = ref("");
 const isShowModifyPasswordDialog = ref(false);
@@ -172,33 +175,6 @@ onMounted(() => {
   }
 
 });
-
-
-onUnmounted(() => {
-
-  imagePreview?.destroy();
-
-});
-
-
-/**
- *
- * @author LiGuanda
- * @date 2024/2/12 上午 10:55:53
- * @filename Profile.vue
- * @description 用于预览头像图片
- *
- */
-function previewAvatar() {
-
-  imagePreview = new ImagePreview({
-
-    imgs: [userData.value.avatar]
-
-  });
-  imagePreview.show(0);
-
-}
 
 
 /**

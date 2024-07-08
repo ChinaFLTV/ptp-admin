@@ -2,7 +2,7 @@
  *
  * @author
  * @date 2024/2/9 下午 11:44:25
- * @filename Routes.ts
+ * @filename routes.ts
  * @description 标记主要的Route
  *
  */
@@ -14,9 +14,6 @@ import DashBoard from "@/layout/content/DashBoard.vue";
 import ContentManage from "@/layout/content/ContentManage.vue";
 import UserManage from "@/layout/content/UserManage.vue";
 import VersionControl from "@/layout/content/VersionControl.vue";
-import {useI18n} from "@/hooks/web/useI18n";
-
-const { t } = useI18n()
 
 
 export const routes = [
@@ -35,7 +32,7 @@ export const routes = [
                 component: Empty,
                 meta: {
 
-                    title: "空白页"
+                    titleKey: "common.page.blankPage"
 
                 }
 
@@ -52,7 +49,7 @@ export const routes = [
                         component: Profile,
                         meta: {
 
-                            title: "个人信息"
+                            titleKey: "common.bar.top.profile"
 
                         }
 
@@ -73,7 +70,7 @@ export const routes = [
                         component: DashBoard,
                         meta: {
 
-                            title: t("common.bar.side.dashboard")
+                            titleKey: "common.bar.side.dashboard"
 
                         }
 
@@ -84,7 +81,7 @@ export const routes = [
                         component: ContentManage,
                         meta: {
 
-                            title: t("common.bar.side.contentManage")
+                            titleKey: "common.bar.side.contentManage"
 
                         }
 
@@ -95,7 +92,7 @@ export const routes = [
                         component: UserManage,
                         meta: {
 
-                            title: t("common.bar.side.userManage")
+                            titleKey: "common.bar.side.userManage"
 
                         }
 
@@ -106,7 +103,7 @@ export const routes = [
                         component: VersionControl,
                         meta: {
 
-                            title: t("common.bar.side.versionControl")
+                            titleKey: "common.bar.side.versionControl"
 
                         }
 
@@ -126,7 +123,7 @@ export const routes = [
         component: Login,
         meta: {
 
-            title: t("login.loginTitle")
+            titleKey: "login.loginTitle"
 
         }
 

@@ -50,6 +50,11 @@ export default {
             logout: "正在登出...",
             incompleteInformation: "信息不完整"
 
+        },
+        page: {
+
+            blankPage: "空白页"
+
         }
 
     },
@@ -110,6 +115,16 @@ export default {
                 newHomeAddressIsTheSameAsOldHomeAddress: "新地址与旧地址相同",
                 modifyHomeAddressSucceeded: "修改地址成功",
                 modifyHomeAddressFailed: "修改地址失败"
+
+            }
+
+        },
+        contactUs: {
+
+            dialog: {
+
+                title: "联系我们",
+                content: "欢迎添加达哥QQ，与达哥一起探索编程世界！"
 
             }
 

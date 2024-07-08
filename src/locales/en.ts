@@ -47,6 +47,11 @@ export default {
             navigationFailure: "Navigation Failure",
             logout: "Logout..."
 
+        },
+        page: {
+
+            blankPage: "Blank Page"
+
         }
 
     },
@@ -107,6 +112,16 @@ export default {
                 newHomeAddressIsTheSameAsOldHomeAddress: "New home address is the same as the old home address",
                 modifyHomeAddressSucceeded: "Modify home address succeeded",
                 modifyHomeAddressFailed: "Modify home address failed"
+
+            }
+
+        },
+        contactUs: {
+
+            dialog: {
+
+                title: "Contact Us",
+                content: "Welcome to add Dago QQ and explore the programming world with Dage!"
 
             }
 

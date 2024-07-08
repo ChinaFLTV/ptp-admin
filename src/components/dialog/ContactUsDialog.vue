@@ -1,13 +1,14 @@
 <template>
 
   <!--  2024-1-16  22:33-不可见组件  -->
-  <el-dialog style="border-radius: 20px" width="25%" title="联系我们" draggable center close-on-press-escape
+  <el-dialog style="border-radius: 20px" width="25%" :title="t('content.contactUs.dialog.title')" draggable center
+             close-on-press-escape
              append-to-body>
 
     <div class="contact-us-dialog-container">
 
-      <el-text type="primary">欢迎添加达哥QQ，与达哥一起探索编程世界！</el-text>
-      <el-image style="width:300px" :src="qq_qrcode" alt="达哥QQ二维码"/>
+      <el-text type="primary">{{ $t("content.contactUs.dialog.content")}}</el-text>
+      <el-image style="width:300px" src="src/assets/image/qq_qrcode.jpg" alt="达哥QQ二维码"/>
 
     </div>
 
@@ -18,7 +19,10 @@
 
 <script setup lang="ts">
 
-import qq_qrcode from "@/assets/image/qq_qrcode.jpg";
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 </script>
 
 

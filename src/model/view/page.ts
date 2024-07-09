@@ -9,7 +9,8 @@
 
 export interface Page {
 
-    title: string,
+    titlePlaceholder: string,
+    titleKey?: string,
     name: string,
     path: string,
     id: number,

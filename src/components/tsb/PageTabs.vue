@@ -12,7 +12,7 @@
 
                     <span class="title"
                           :style="{color:(page.id===navigateStore.currentOpenedPage.id?'white':'#606266')}">{{
-                        page.title
+                        page.titleKey ? $t(page.titleKey) : page.titlePlaceholder
                       }}</span>
 
                     <el-icon v-show="page.id===navigateStore.currentOpenedPage.id"

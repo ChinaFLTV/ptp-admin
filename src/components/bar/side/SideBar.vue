@@ -7,7 +7,7 @@
          class="side-bar-item-container"
          v-for="sideBarItem in sideBarItems"
          :key="sideBarItem.name"
-         @click="clickSideTab(sideBarItem.title,sideBarItem.name,NavigationType.TAB_EXCHANGE)">
+         @click="clickSideTab(sideBarItem,NavigationType.TAB_EXCHANGE)">
 
       {{ sideBarItem.title }}
 
@@ -29,6 +29,7 @@ import {ElMessage} from "element-plus";
 import {SideBarItem} from "@/model/view/SideBarItem";
 import {Ref} from "vue";
 import {useI18n} from "vue-i18n";
+import {Page} from "@/model/view/page";
 
 const {t} = useI18n();
 
@@ -39,6 +40,7 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
   {
 
     title: t("common.bar.side.dashboard"),
+    titleKey: "common.bar.side.dashboard",
     name: "dashboard",
     icon: "Histogram"
 
@@ -46,6 +48,7 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
   {
 
     title: t("common.bar.side.contentManage"),
+    titleKey: "common.bar.side.contentManage",
     name: "contentManage",
     icon: "DataAnalysis"
 
@@ -53,6 +56,7 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
   {
 
     title: t("common.bar.side.userManage"),
+    titleKey: "common.bar.side.userManage",
     name: "userManage",
     icon: "UserFilled"
 
@@ -60,6 +64,7 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
   {
 
     title: t("common.bar.side.versionControl"),
+    titleKey: "common.bar.side.versionControl",
     name: "versionControl",
     icon: "SetUp"
 
@@ -73,16 +78,15 @@ const sideBarItems: Ref<Array<SideBarItem>> = ref([
  * @date 2024/2/16 下午 4:54:20
  * @filename SideBar.vue
  * @description 用于处理侧边栏的点击事件
- * @param {string} title 侧边栏选项卡的标题
- * @param {string} name 侧边栏选项卡的导航目的地name
+ * @param {string} sideBarItem 导航的目的条目
  * @param {NavigationType} type 侧边栏选项卡的导航类型
  *
  */
-function clickSideTab(title: string, name: string, type: NavigationType) {
+function clickSideTab(sideBarItem: SideBarItem, type: NavigationType) {
 
   router.push({
 
-    name,
+    name: sideBarItem.name,
     query: {
 
       type
@@ -102,16 +106,17 @@ function clickSideTab(title: string, name: string, type: NavigationType) {
 
     const page = {
 
-      title,
-      name,
-      path: `/main/content/${name.toLowerCase()}`,
+      titlePlaceholder: sideBarItem.title,
+      titleKey: sideBarItem.titleKey,
+      name: sideBarItem.name,
+      path: `/main/content/${sideBarItem.name.toLowerCase()}`,
       id: randomUUID(),
       openTime: new Date(),
       draggable: true,
       closeable: true,
       cached: true
 
-    };
+    } as Page;
 
     if (navigateStore.openedPages.filter(p => p.path == page.path).length > 0) {
 

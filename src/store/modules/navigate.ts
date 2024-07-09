@@ -9,7 +9,8 @@ export const NavigateStore = defineStore("navigateStore", {
 
         const openedPages: Ref<Array<Page>> = ref([{
 
-            title: "仪表盘",
+            titlePlaceholder: "仪表盘",
+            titleKey: "common.bar.side.dashboard",
             name: "dashboard",
             path: "dashboard",
             id: randomUUID(),

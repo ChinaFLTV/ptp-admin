@@ -14,9 +14,7 @@ import randomUUID from "@/utils/uuid";
 import {NavigationType} from "@/enums/NavigationType";
 import {Page} from "@/model/view/page";
 import {App} from "vue";
-import {i18n} from "@/plugins/vueI18n";
 
-const {t} = i18n.global;
 
 // 2024-2-7  15:24-每个路由都需要映射到一个组件
 // 2024-2-7  15:20-进行Vue路由初始化相关工作
@@ -51,7 +49,8 @@ router.beforeEach(to => {
 
             const page: Page = {
 
-                title: to.meta.title as string,
+                titlePlaceholder: "",
+                titleKey: to.meta.titleKey as string,
                 name: to.name.toString(),
                 path: to.path,
                 openTime: new Date(),
@@ -92,14 +91,12 @@ router.beforeEach(to => {
 });
 
 // 2024-7-8  14:11-注册全局后置钩子 , 以便根据字符串key依据区域配置动态显示国际化标题
-router.afterEach((to) => {
+/*router.afterEach((to) => {
 
+    const {t} = i18n.global;
     to.meta.title = t(to.meta.titleKey as string) as string;
-    console.log("-----------------------------");
-    console.log(to.meta.titleKey);
-    console.log(to.meta.title);
 
-});
+});*/
 
 
 /**

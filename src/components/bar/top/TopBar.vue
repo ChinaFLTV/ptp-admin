@@ -6,11 +6,14 @@
         class="logo-container"
         src="../../../assets/logo.svg"
         alt="PTP LOGO"
+        @click="jumpToUrl(PTP_WEB_SITE_URL)"
     />
 
-    <span class="web-name-text-container">
-      <a href="http://www.ptp.ink">{{ $t("common.bar.top.appTitle") }}</a>
-    </span>
+    <wave-view class="website-title-container" :multiple="10">
+      <span class="web-name-text-container">
+        <span>{{ $t("common.bar.top.appTitle") }}</span>
+      </span>
+    </wave-view>
 
     <div class="flex-grow-spacer"/>
 
@@ -85,6 +88,8 @@ import {Icon} from "@iconify/vue";
 import {Locale, useLocaleStore} from "@/store/modules/locale";
 import {useLocale} from "@/hooks/web/useLocale";
 import {i18n} from "@/plugins/vueI18n";
+import WaveView from "@/components/animation/WaveView.vue";
+import {PTP_WEB_SITE_URL} from "@/constants/web";
 
 
 const welcomeUserNameRef = ref(null);
@@ -170,6 +175,7 @@ function updateComponentStatus() {
   if (userData !== null) {
 
     console.log("更新顶栏组件状态为登录状态");
+    // @ts-ignore
     welcomeUserNameRef.value.innerHTML = t("common.bar.top.welcome", {nickname: userDataStore.localUserData.nickname});
     avatarUrl.value = userData.avatar;
 
@@ -201,6 +207,22 @@ function changeLanguage(newLocale: Locale) {
 }
 
 
+/**
+ *
+ * @author Lenovo
+ * @date 2024/7/11 PM 10:53:33
+ * @filename TopBar.vue
+ * @param url {string} 指定的网页链接
+ * @description 跳转到指定URL的页面处
+ *
+ */
+function jumpToUrl(url: string) {
+
+  window.location.href = url;
+
+}
+
+
 defineExpose({
 
   updateComponentStatus
@@ -221,7 +243,6 @@ defineExpose({
   border-radius: 10px;
   align-items: center;
 
-
   .common-decor {
 
     margin: 5px 10px;
@@ -236,22 +257,32 @@ defineExpose({
     height: 50px;
     border-radius: 50%;
     user-select: none;
-    pointer-events: none;
+    pointer-events: visible;
 
   }
 
-  .web-name-text-container {
+  .website-title-container {
 
-    margin: 5px 10px;
-    background-image: linear-gradient(145deg, red, blue) !important;
-    background-clip: text;
-    cursor: default;
+    height: 100%;
+    padding-left: 50px;
+    padding-right: 50px;
+    pointer-events: visible;
 
-    & > * {
+    .web-name-text-container {
 
-      font-weight: bolder;
-      font-size: 1.5rem;
+      margin: 5px 10px;
+      background-image: linear-gradient(145deg, red, blue) !important;
+      background-clip: text;
+      cursor: default;
       user-select: none;
+
+      & > * {
+
+        font-weight: bolder;
+        font-size: 1.5rem;
+        user-select: none;
+
+      }
 
     }
 

@@ -31,6 +31,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/bar/side/SideBar.vue')['default']
     TopBar: typeof import('./src/components/bar/top/TopBar.vue')['default']
+    WaveView: typeof import('./src/components/animation/WaveView.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

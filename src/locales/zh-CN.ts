@@ -55,6 +55,11 @@ export default {
 
             blankPage: "空白页"
 
+        },
+        tips: {
+
+            emptyContent: "空内容"
+
         }
 
     },

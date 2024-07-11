@@ -52,6 +52,11 @@ export default {
 
             blankPage: "Blank Page"
 
+        },
+        tips: {
+
+            emptyContent: "Empty Content"
+
         }
 
     },

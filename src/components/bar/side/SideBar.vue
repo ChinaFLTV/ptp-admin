@@ -157,6 +157,7 @@ function clickSideTab(sideBarItem: SideBarItem, type: NavigationType) {
     letter-spacing: 5px;
     opacity: 0.7;
     color: black;
+    user-select: none;
 
   }
 

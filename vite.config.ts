@@ -88,7 +88,7 @@ export default defineConfig({
     // 2024-2-6  16:23-启用Vite热更新功能
     server: {
 
-        host: "localhost",
+        host: "0.0.0.0", // 2024-7-28  13:56-表明接受来自同一网络中任何设备的连接
         hmr: true
 
     }

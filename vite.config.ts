@@ -89,7 +89,20 @@ export default defineConfig({
     server: {
 
         host: "0.0.0.0", // 2024-7-28  13:56-表明接受来自同一网络中任何设备的连接
-        hmr: true
+        hmr: true,
+        // 2024-8-1  21:04-貌似GET、POST方法可以被处理跨域，PUT与DELETE方法不能，需要主动去后端进行跨域处理
+        // 2024-8-1  15:43-配置代理，以便进行本地跨域API测试
+        /*proxy: {
+
+            "/api/v1/web": {
+
+                target: "http://127.0.0.1:8080",
+                changeOrigin: true
+                // rewrite:(path:string):string => path.replace(/^\/api/,"")
+
+            }
+
+        }*/
 
     }
 

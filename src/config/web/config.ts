@@ -6,7 +6,9 @@
  * @description Web相关的数据配置
  *
  */
+import {PTP_GATEWAY_CONTEXT_URL, PTP_WEB_CONTEXT_URL, PTP_WEB_SITE_URL} from "@/constants/web";
 
+// noinspection HttpUrlsUsage
 const config = {
 
     /**
@@ -14,10 +16,10 @@ const config = {
      * @author Lenovo
      * @date 2024/7/2 PM 4:10:53
      * @filename config.ts
-     * @description api请求的基础路径
+     * @description api请求的基础路径(包含网关&Web微服务模块的上下文路径)
      *
      */
-    base_url: "http://119.45.0.82:8080",
+    base_url: PTP_WEB_SITE_URL + PTP_GATEWAY_CONTEXT_URL + PTP_WEB_CONTEXT_URL,
     /**
      *
      * @author Lenovo

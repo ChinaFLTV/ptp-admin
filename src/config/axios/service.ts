@@ -13,7 +13,12 @@ export const service: AxiosInstance = axios.create({
 
     baseURL: config.base_url, // 2024-7-1  18:17-基础服务地址 , 这个值会被添加到实际请求 URL 的前面
     timeout: config.request_timeout, // 2024-7-1  18:17-超时时间 , 单位是毫秒
-    withCredentials: true // 2024-7-1  18:18-是否携带cookie发送跨域请求 , 默认为 false
+    withCredentials: true, // 2024-7-1  18:18-是否携带cookie发送跨域请求 , 默认为 false
+    headers: {
+
+        Authorization: "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJwdHAtdXNlci1sb2dpbi1pbmZvIiwib2JqZWN0X2luZm8iOiIxIiwiaXNzIjoiSVNTIiwiaWF0IjoxNzIyNjA5ODQ5LCJleHAiOjE3MjMyMTQ2NDksImp0aSI6InB0cC1vYmplY3Qtand0In0.l7JwhgAJcBqzRDo9XBrHO9CUI2pnkt-IKk9nfYT3Nq8"
+
+    }
 
 });
 

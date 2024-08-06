@@ -8,7 +8,7 @@
  */
 
 // 2024-7-11  22:58-PTP在线站点的链接地址
-export const PTP_WEB_SITE_URL: string = "http://127.0.0.1:8150";
+export const PTP_WEB_SITE_URL: string = "http://localhost:8150";
 
 
 // 2024-8-1  21:15-PTP 网关微服务模块的上下文基地址

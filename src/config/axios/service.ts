@@ -8,6 +8,7 @@
  */
 import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import {config} from "../web/config";
+import {usePermissionStore} from "@/store/modules/permisssion";
 
 export const service: AxiosInstance = axios.create({
 
@@ -16,7 +17,7 @@ export const service: AxiosInstance = axios.create({
     withCredentials: true, // 2024-7-1  18:18-是否携带cookie发送跨域请求 , 默认为 false
     headers: {
 
-        Authorization: "eyJ0eXBlIjoiand0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJwdHAtdXNlci1sb2dpbi1pbmZvIiwib2JqZWN0X2luZm8iOiIxIiwiaXNzIjoiSVNTIiwiaWF0IjoxNzIyNjA5ODQ5LCJleHAiOjE3MjMyMTQ2NDksImp0aSI6InB0cC1vYmplY3Qtand0In0.l7JwhgAJcBqzRDo9XBrHO9CUI2pnkt-IKk9nfYT3Nq8"
+        Authorization: "BLANK AUTHORIZATION"
 
     }
 
@@ -25,17 +26,23 @@ export const service: AxiosInstance = axios.create({
 
 // 2024-7-1  18:31-为每一次的请求自动添加TOKEN请求头(如果本地有TOKEN缓存的话)
 service.interceptors.request.use(
+
     (config: InternalAxiosRequestConfig<any>) => {
 
-        const token: String = localStorage.getItem("token");
+        // 2024-8-6  21:57-更新最新的令牌信息
+        const permissionStore = usePermissionStore();
+        config.headers["Authorization"] = permissionStore?.getAuthorization;
 
         return config;
 
     }
+
 );
 
 
 // 2024-7-1  18:22-剔除掉Axios自动为响应数据添加的额外数据 , 直接将最终的响应数据转换为服务端真正返回的响应数据
 service.interceptors.response.use(
+
     (response: AxiosResponse<any, any>) => response.data
+
 );

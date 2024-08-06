@@ -6,7 +6,7 @@
  * @description Web相关的数据配置
  *
  */
-import {PTP_GATEWAY_CONTEXT_URL, PTP_WEB_CONTEXT_URL, PTP_WEB_SITE_URL} from "@/constants/web";
+import {PTP_WEB_CONTEXT_URL, PTP_WEB_SITE_URL} from "@/constants/web";
 
 // noinspection HttpUrlsUsage
 const config = {
@@ -19,7 +19,7 @@ const config = {
      * @description api请求的基础路径(包含网关&Web微服务模块的上下文路径)
      *
      */
-    base_url: PTP_WEB_SITE_URL + PTP_GATEWAY_CONTEXT_URL + PTP_WEB_CONTEXT_URL,
+    base_url: PTP_WEB_SITE_URL + PTP_WEB_CONTEXT_URL,
     /**
      *
      * @author Lenovo
@@ -28,7 +28,7 @@ const config = {
      * @description 接口请求的超时时间(单位 : ms)
      *
      */
-    request_timeout: 5000
+    request_timeout: 10_000
 
 };
 

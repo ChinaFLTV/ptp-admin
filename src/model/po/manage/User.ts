@@ -26,7 +26,7 @@ export interface User {
     likeNum?: number; // 用户被点赞数量
     userRank?: number; // 用户等级
     birthDate?: Date; // 用户出生年月
-    addressInfoId?: number; // 用户地址信息ID
+    address?: string; // 用户家庭地址信息
     bindAccounts?: string[]; // 用户绑定的其他账号
     credit?: number; // 用户信誉积分
     status?: UserStatus; // 用户当前状态

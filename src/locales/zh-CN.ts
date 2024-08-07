@@ -68,6 +68,7 @@ export default {
 
         loginTitle: "登录",
         accountPlaceholder: "请输入账号",
+        nicknamePlaceholder: "请输入用户名",
         passwordPlaceholder: "请输入密码",
         message: {
 

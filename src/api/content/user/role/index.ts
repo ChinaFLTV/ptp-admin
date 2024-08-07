@@ -67,7 +67,7 @@ export const insertSingleRole = async (roleVo: RoleVo): Promise<Result<any>> => 
  */
 export const updateSingleRole = async (roleVo: RoleVo): Promise<Result<any>> => {
 
-    return await service.put(`${PTP_USER_ROLE_BASE_URL}/update/single`, {data: roleVo});
+    return await service.put(`${PTP_USER_ROLE_BASE_URL}/update/single`, roleVo);
 
 };
 

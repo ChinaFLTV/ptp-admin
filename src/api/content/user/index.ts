@@ -63,12 +63,12 @@ export const insertSingleUser = async (userVo: UserVo): Promise<Result<any>> => 
  * @date 2024/8/7 AM 12:00:35
  * @filename index.ts
  * @description 更新系统中的用户记录
- * @param userVo 包含更新信息的用户值对象
+ * @param user {User} 包含更新信息的用户值对象
  * @returns 返回更新操作的结果
  */
-export const updateUser = async (userVo: UserVo): Promise<Result<any>> => {
+export const updateSingleUser = async (user: User): Promise<Result<any>> => {
 
-    return await service.put(`${PTP_USER_BASE_URL}/update/single`, {data: userVo});
+    return await service.put(`${PTP_USER_BASE_URL}/update/single`, user);
 
 };
 
@@ -81,7 +81,7 @@ export const updateUser = async (userVo: UserVo): Promise<Result<any>> => {
  * @param id 需要删除的用户的ID
  * @returns 返回删除操作的结果
  */
-export const deleteUser = async (id: number): Promise<Result<any>> => {
+export const deleteSingleUser = async (id: number): Promise<Result<any>> => {
 
     return await service.delete(`${PTP_USER_BASE_URL}/delete/single/${id}`);
 

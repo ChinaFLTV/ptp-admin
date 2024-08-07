@@ -67,7 +67,7 @@ export const insertSinglePassageComment = async (passageCommentVo: PassageCommen
  */
 export const updateSinglePassageComment = async (passageCommentVo: PassageCommentVo): Promise<Result<any>> => {
 
-    return await service.put(`${PTP_PASSAGE_COMMENT_BASE_URL}/update/single`, { data: passageCommentVo });
+    return await service.put(`${PTP_PASSAGE_COMMENT_BASE_URL}/update/single`, passageCommentVo);
 
 };
 

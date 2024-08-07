@@ -18,7 +18,7 @@
         <p class="profileValue" style="display: inline-block">{{ userData?.nickname }}</p>
         <span class="modify" @click="isShowRenameDialog = true">{{ $t("content.profile.changeNickname") }}</span>
         <h3 class="profileKey">{{ $t("content.profile.registerDate") }}</h3>
-        <p class="profileValue">{{ dayjs(userData?.registerDate).format("YYYY年M月D日 HH:mm:ss") }}</p>
+        <p class="profileValue">{{ dayjs(userData?.createTime).format("YYYY年M月D日 HH:mm:ss") }}</p>
         <h3 class="profileKey">{{ $t("content.profile.homeAddress") }}</h3>
         <transition name="el-fade-in-linear">
           <div v-show="isShowUserAddress">
@@ -55,7 +55,7 @@
 
         <h3 class="profileKey">{{ $t("content.profile.avatar") }}</h3>
         <el-image class="avatar" ref="avatarRef"
-                  :src="userData?.avatar" :alt="t('content.profile.avatar')"
+                  :src="JSON.parse(userData?.avatar).uri" :alt="t('content.profile.avatar')"
                   :zoom-rate="1.2"
                   :max-scale="7"
                   :min-scale="0.2"
@@ -66,7 +66,7 @@
         <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
         <h3 class="profileKey">{{ $t("content.profile.sex") }}</h3>
         <p class="profileValue">{{
-            userData?.sex === "male" ? $t("content.profile.sex_male") : userData?.sex === "female" ? $t("content.profile.sex_female") : $t("content.profile.sex_secret")
+            userData?.gender === Gender.MALE ? $t("content.profile.sex_male") : userData?.gender === Gender.FEMALE ? $t("content.profile.sex_female") : $t("content.profile.sex_secret")
           }}</p>
         <h3 class="profileKey">{{ $t("content.profile.credit") }}</h3>
         <p ref="creditRef" class="profileValue"
@@ -121,14 +121,16 @@
 
 
 import {UserDataStore} from "@/store/modules/user";
-import Administrator from "@/model/Administrator";
 import {desensitize} from "@/utils/desensitization";
 import {ElMessage} from "element-plus";
-import {service} from "@/config/axios/service";
 import {pcaTextArr} from "element-china-area-data";
 import dayjs from "dayjs";
 import {CascaderOption} from "element-plus/lib/components";
 import {useI18n} from "vue-i18n";
+import {User} from "@/model/po/manage/User";
+import {Gender} from "@/enums/Gender";
+import {Ref} from "vue";
+import {updateSingleUser} from "@/api/content/user";
 
 const {t} = useI18n();
 
@@ -140,17 +142,17 @@ const newNicknameRef = ref(null);
 
 const userDataStore = UserDataStore();
 // 2024-2-11  10:57-能够进入当前页面，则用户一定已经登录了
-const userData = ref(userDataStore.getUserData() as Administrator);
-const isShowRenameDialog = ref(false);
-const newNickname = ref("");
-const isShowModifyPasswordDialog = ref(false);
-const oldPassword = ref("");
-const newPassword = ref("");
-const newPasswordAgain = ref("");
+const userData: Ref<User> = ref(userDataStore.getUserData() as User);
+const isShowRenameDialog: Ref<boolean> = ref(false);
+const newNickname: Ref<string> = ref("");
+const isShowModifyPasswordDialog: Ref<boolean> = ref(false);
+const oldPassword: Ref<string> = ref("");
+const newPassword: Ref<string> = ref("");
+const newPasswordAgain: Ref<string> = ref("");
 // 2024-2-13  16:27-用于暂存用户的家庭住址数据
-const address = ref([] as string[]);
-const isShowUserAddress = ref(true);
-const isShowModifyAddressArea = ref(false);
+const address: Ref<string[]> = ref([] as string[]);
+const isShowUserAddress: Ref<boolean> = ref(true);
+const isShowModifyAddressArea: Ref<boolean> = ref(false);
 
 
 onMounted(() => {
@@ -209,7 +211,7 @@ function submitRename() {
     const oldNickname = userData.value.nickname;
     userData.value.nickname = newNickname.value;
 
-    service.post("/manage/administrator/update/single", userData.value)
+    updateSingleUser(userData.value)
         .then(() => {
 
           ElMessage({
@@ -277,7 +279,7 @@ function submitModifyPassword() {
   }
 
   userData.value.password = newPassword.value;
-  service.post("/manage/administrator/update/single", userData.value)
+  updateSingleUser(userData.value)
       .then(() => {
 
         ElMessage({
@@ -320,8 +322,6 @@ function submitModifyPassword() {
  */
 function submitModifyAddress() {
 
-  console.log(address.value);
-
   if (userData.value.address === JSON.stringify(address.value)) {
 
     ElMessage.warning(t("content.profile.message.newHomeAddressIsTheSameAsOldHomeAddress"));
@@ -332,7 +332,8 @@ function submitModifyAddress() {
   const oldAddress = userData.value.address;
 
   userData.value.address = JSON.stringify(address.value);
-  service.post("/manage/administrator/update/single", userData.value)
+
+  updateSingleUser(userData.value)
       .then(() => {
 
         ElMessage({

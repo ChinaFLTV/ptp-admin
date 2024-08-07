@@ -12,7 +12,7 @@ export const usePermissionStore = defineStore("permission", {
 
     state: () => {
 
-        let authorization: string = "";
+        let authorization: string = localStorage.getItem("authorization") ?? "BLANK AUTHORIZATION";
 
         return {
 
@@ -37,7 +37,15 @@ export const usePermissionStore = defineStore("permission", {
             // 2024-8-6  21:59-||与??的使用区别
             // || : 只要前面是假(falsy)值(如null、undefined、""、‘’、0),就使用后面的值
             // ?? : 只有前面的值是null或undefined的时候才启用后面的值
-            this.authorization = newAuthorization ?? "";
+            this.authorization = newAuthorization || "EMPTY AUTHORIZATION";
+            // 2024-8-7  18:09-持久化用户凭证信息(生命周期由 会话级 转变为 持久级)
+            localStorage.setItem("authorization", newAuthorization);
+
+        },
+        removeAuthorization() {
+
+            this.authorization = "AUTHORIZATION HAS BEEN REMOVED";
+            localStorage.removeItem("authorization");
 
         }
 

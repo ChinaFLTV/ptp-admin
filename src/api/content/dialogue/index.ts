@@ -64,7 +64,7 @@ export const insertSingleDialogue = async (dialogueVo: DialogueVo): Promise<Resu
  */
 export const updateSingleDialogue = async (dialogueVo: DialogueVo): Promise<Result<any>> => {
 
-    return await service.put(`${PTP_DIALOGUE_BASE_URL}/update/single`, {data: dialogueVo});
+    return await service.put(`${PTP_DIALOGUE_BASE_URL}/update/single`, dialogueVo);
 
 };
 

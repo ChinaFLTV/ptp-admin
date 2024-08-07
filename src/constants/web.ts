@@ -31,3 +31,6 @@ export const PTP_USER_BASE_URL: string = "/content/user";
 export const PTP_USER_ROLE_BASE_URL: string = "/content/user/role";
 // 2024-8-4  17:49-user login子模块的基地址
 export const PTP_USER_LOGIN_BASE_URL: string = "/gate";
+
+
+export const USER_LOGIN_COOKIE_KEY: string = "login_client_info"; // 2024-8-7  14:31-用户登录的环境信息Cookie对应的key

@@ -79,11 +79,7 @@ export const insertSingleAnnouncement = async (announcementVo: AnnouncementVo): 
  */
 export const updateSingleAnnouncement = async (announcementVo: AnnouncementVo): Promise<Result<any>> => {
 
-    return await service.put(PTP_ANNOUNCEMENT_BASE_URL + "/update/single", {
-
-        data: announcementVo
-
-    }) as Result<any>;
+    return await service.put(PTP_ANNOUNCEMENT_BASE_URL + "/update/single", announcementVo) as Result<any>;
 
 };
 

@@ -90,6 +90,8 @@ import {useLocale} from "@/hooks/web/useLocale";
 import {i18n} from "@/plugins/vueI18n";
 import WaveView from "@/components/animation/WaveView.vue";
 import {PTP_WEB_SITE_URL} from "@/constants/web";
+import {LoginClientType} from "@/enums/LoginClientType";
+import {logout} from "@/api/content/user/login";
 
 
 const welcomeUserNameRef = ref(null);
@@ -131,7 +133,9 @@ function clickDropDownMenuItem(command: number) {
 
     case 1:
 
-      userDataStore.removeUserData();
+      // 2024-8-7  16:4-通知云端和本地清理用户数据信息
+      logout(LoginClientType.WEB, userDataStore.localUserData.id);
+
       emits("hideComponent", () => {
 
         router.push({
@@ -177,7 +181,7 @@ function updateComponentStatus() {
     console.log("更新顶栏组件状态为登录状态");
     // @ts-ignore
     welcomeUserNameRef.value.innerHTML = t("common.bar.top.welcome", {nickname: userDataStore.localUserData.nickname});
-    avatarUrl.value = userData.avatar;
+    avatarUrl.value = JSON.parse(userData?.avatar).uri;
 
   }
 

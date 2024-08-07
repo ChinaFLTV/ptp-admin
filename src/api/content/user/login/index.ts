@@ -11,6 +11,9 @@ import {service} from "@/config/axios/service";
 import {PTP_USER_LOGIN_BASE_URL} from "@/constants/web";
 import {UserLoginVo} from "@/model/vo/UserLoginVo";
 import {usePermissionStore} from "@/store/modules/permisssion";
+import {LoginClientType} from "@/enums/LoginClientType";
+import {UserDataStore} from "@/store/modules/user";
+import {User} from "@/model/po/manage/User";
 
 
 /**
@@ -24,7 +27,7 @@ import {usePermissionStore} from "@/store/modules/permisssion";
  * @description 普通登录(用户名+密码)
  *
  */
-export const login = async (nickname: string, password: string): Promise<Result<Map<string, any>>> => {
+export const loginByNicknameAndPassword = async (nickname: string, password: string): Promise<Result<Map<string, any>>> => {
 
     const userLoginVo: UserLoginVo = {
         nickname,
@@ -73,13 +76,57 @@ export const login = async (nickname: string, password: string): Promise<Result<
     };
 
     const permissionStore = usePermissionStore();
+    const userDataStore = UserDataStore();
 
-    const loginInfo: Result<Map<string, any>> = await service.post(PTP_USER_LOGIN_BASE_URL + "/login", userLoginVo) as Result<Map<string, any>>;
+    const loginInfo: Result<Map<string, any>> = await service.post(`${PTP_USER_LOGIN_BASE_URL}/login`, userLoginVo) as Result<Map<string, any>>;
 
     const STORE_KEY: string = loginInfo["data"]["store_key"]; // 2024-8-6  00:44-这就是后续请求都需要带上的权限验证Header——Authorization
+    const user: User = loginInfo["data"]["user"];
 
     permissionStore.updateAuthorization(STORE_KEY);
+    userDataStore.updateUserData(user);
 
     return loginInfo;
+
+};
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/7 PM 2:16:16
+ * @filename index.ts
+ * @param clientType {LoginClientType} 当前需要进行登出操作的客户端类型(保证单端单登录/登出)
+ * @param userId {number} 用户ID
+ * @return {Promise<any>} 服务端返回的登出消息
+ * @description 登出用户并移除用户本地数据信息
+ *
+ */
+export const logout = async (clientType: LoginClientType, userId: number): Promise<Result<any>> => {
+
+    const permissionStore = usePermissionStore();
+    // const cookie = useCookie();
+    const userDataStore = UserDataStore();
+
+    const res = await service.post(`${PTP_USER_LOGIN_BASE_URL}/logout`, null, {
+
+            params: {
+
+                clientType: clientType.valueOf(),
+                userId
+
+            }
+
+        })
+    ;
+
+    // 2024-8-7  14:24-清除客户端浏览器的用户信息缓存
+    permissionStore.removeAuthorization();
+    // 2024-8-7  14:41-Cookie中的数据不需要由客户端来主动删除 , 而是由服务端回复的Response的Set-Cookie进行删除
+    // cookie.remove(USER_LOGIN_COOKIE_KEY);
+
+    userDataStore.removeUserData();
+
+    return res;
 
 };

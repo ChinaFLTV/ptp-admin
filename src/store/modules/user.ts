@@ -1,15 +1,15 @@
 import {defineStore} from "pinia";
-import Administrator from "@/model/Administrator";
 import {Ref} from "vue";
+import {User} from "@/model/po/manage/User";
 
 export const UserDataStore = defineStore("userData", {
 
     state: () => {
 
-        const localUserData: Ref<Administrator> = ref(null);
+        const localUserData: Ref<User> = ref(null);
         if (localStorage.getItem("localUserData") != null) {
 
-            localUserData.value = JSON.parse(localStorage.getItem("localUserData")) as Administrator;
+            localUserData.value = JSON.parse(localStorage.getItem("localUserData")) as User;
 
         }
 
@@ -19,7 +19,7 @@ export const UserDataStore = defineStore("userData", {
     getters: {},
     actions: {
 
-        updateUserData(user) {
+        updateUserData(user: User) {
 
             localStorage.setItem("localUserData", JSON.stringify(user));
             this.localUserData = user;
@@ -31,7 +31,7 @@ export const UserDataStore = defineStore("userData", {
             this.localUserData = null;
 
         },
-        getUserData(): Administrator {
+        getUserData(): User {
 
             const cachedUserData = localStorage.getItem("localUserData");
             if (cachedUserData === undefined) {
@@ -42,7 +42,7 @@ export const UserDataStore = defineStore("userData", {
 
                 try {
 
-                    return JSON.parse(cachedUserData) as Administrator;
+                    return JSON.parse(cachedUserData) as User;
 
                 } catch (err) {
 

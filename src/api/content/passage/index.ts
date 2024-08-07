@@ -68,7 +68,7 @@ export const insertSinglePassage = async (passageVo: PassageVo): Promise<Result<
  */
 export const updateSinglePassage = async (passageVo: PassageVo): Promise<Result<any>> => {
 
-    return await service.put(`${PTP_PASSAGE_BASE_URL}/update/single`, {data: passageVo});
+    return await service.put(`${PTP_PASSAGE_BASE_URL}/update/single`, passageVo);
 
 };
 

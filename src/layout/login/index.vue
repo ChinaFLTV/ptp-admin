@@ -10,9 +10,9 @@
         </transition>
         <transition name="el-zoom-in-bottom">
           <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
-                    :placeholder="$t('login.accountPlaceholder')"
+                    :placeholder="$t('login.nicknamePlaceholder')"
                     input-style="{background-color:transparent;color:antiquewhite;}"
-                    v-model="loginData.account" clearable/>
+                    v-model="loginData.nickname" clearable/>
         </transition>
         <transition name="el-zoom-in-bottom">
           <el-input v-show="isShowLoginForm" class="inputContainer" :disabled="!isOperateForm"
@@ -42,10 +42,10 @@
 import {ElMessage} from "element-plus";
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/modules/user";
-import Administrator from "@/model/Administrator";
 import {NavigationType} from "@/enums/NavigationType";
-import {loginByAccountAndPassword} from "@/api/system/login";
 import {useI18n} from "vue-i18n";
+import {loginByNicknameAndPassword} from "@/api/content/user/login";
+import {User} from "@/model/po/manage/User";
 
 const {t} = useI18n();
 
@@ -64,7 +64,7 @@ const userDataStore = UserDataStore();
 
 const loginData = ref({
 
-  account: "",
+  nickname: "",
   password: ""
 
 });
@@ -98,7 +98,7 @@ function login() {
 
   isLoggingIn.value = true;
 
-  if (loginData.value.account.toString().trim() === "" || loginData.value.password.toString().trim() === "") {
+  if (loginData.value.nickname.toString().trim() === "" || loginData.value.password.toString().trim() === "") {
 
     ElMessage({
 
@@ -115,11 +115,11 @@ function login() {
   }
 
 
-  loginByAccountAndPassword(loginData.value.account, loginData.value.password).then(response => {
+  loginByNicknameAndPassword(loginData.value.nickname, loginData.value.password).then(response => {
 
     // response = response.data;
     // @ts-ignore
-    if (response === undefined || response.code != 200) {
+    if (!response) {
 
       ElMessage({
 
@@ -173,7 +173,6 @@ function login() {
       setTimeout(() => {
 
         isShowLoginBox.value = false;
-        userDataStore.updateUserData(response.data as Administrator);
         router.push({
 
           name: "main",
@@ -193,6 +192,19 @@ function login() {
       console.error(err);
 
     });
+
+  }).catch(err => {
+
+    ElMessage({
+
+      message: err.response.data.data,
+      showClose: true,
+      type: "error",
+      center: true
+
+    });
+    isLoggingIn.value = false;
+    isOperateForm.value = true;
 
   });
 

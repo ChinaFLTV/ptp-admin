@@ -64,6 +64,7 @@ export default {
 
         loginTitle: "login",
         accountPlaceholder: "Please enter your account number",
+        nicknamePlaceHolder: "Please enter your nickname",
         passwordPlaceholder: "Please enter your password",
         message: {
 

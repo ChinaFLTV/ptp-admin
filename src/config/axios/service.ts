@@ -9,6 +9,8 @@
 import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import {config} from "../web/config";
 import {usePermissionStore} from "@/store/modules/permisssion";
+import {ResponseStatus} from "@/enums/ResponseStatus";
+import {PtpException} from "@/exceptions/PtpException";
 
 export const service: AxiosInstance = axios.create({
 
@@ -26,7 +28,6 @@ export const service: AxiosInstance = axios.create({
 
 // 2024-7-1  18:31-为每一次的请求自动添加TOKEN请求头(如果本地有TOKEN缓存的话)
 service.interceptors.request.use(
-
     (config: InternalAxiosRequestConfig<any>) => {
 
         // 2024-8-6  21:57-更新最新的令牌信息
@@ -36,13 +37,27 @@ service.interceptors.request.use(
         return config;
 
     }
-
 );
 
 
 // 2024-7-1  18:22-剔除掉Axios自动为响应数据添加的额外数据 , 直接将最终的响应数据转换为服务端真正返回的响应数据
 service.interceptors.response.use(
+    (response: AxiosResponse<any, any>) => {
 
-    (response: AxiosResponse<any, any>) => response.data
+        if (response.data) {
 
+            // 2024-8-8  17:48-处理HTTP层面正常单业务层面异常的情况
+            if (response.data.status === ResponseStatus.FAILURE) {
+
+                // 2024-8-8  17:45-将响应包装为异常给后续业务调用
+                throw new PtpException(response.data);
+
+            }
+            return response.data;
+
+        }
+
+        throw new PtpException("Invalid response data!");
+
+    }
 );

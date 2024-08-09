@@ -27,7 +27,7 @@ export default {
                 enterFullscreen: "Enter Fullscreen",
                 exitFullscreen: "Exit Fullscreen",
                 changeLanguage: "Change Language",
-                enterLogin: "Please Login",
+                enterLogin: "Please login",
                 exitLogin: "Logout",
                 welcome: "Welcome, {nickname}",
                 profile: "Profile"
@@ -70,7 +70,7 @@ export default {
 
             incompleteInformation: "Incomplete Information",
             incorrectInformation: "The account or password is incorrect",
-            loginError: "Login Error",
+            loginError: "login Error",
             checkPass: "Verification passed, please wait"
 
         }

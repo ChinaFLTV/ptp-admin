@@ -7,7 +7,7 @@
  *
  */
 
-export interface PtpException {
+export class PtpException extends Error {
 
 
     code?: number; // 错误码为8xx

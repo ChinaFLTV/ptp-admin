@@ -1,6 +1,6 @@
 <template>
 
-  <div class="userProfileContainer">
+  <div class="user-profile-container">
 
     <h1 class="profileTitle">{{ $t("common.bar.top.profile") }}</h1>
     <div style="display: flex;">
@@ -130,7 +130,7 @@ import {useI18n} from "vue-i18n";
 import {User} from "@/model/po/manage/User";
 import {Gender} from "@/enums/Gender";
 import {Ref} from "vue";
-import {updateSingleUser} from "@/api/content/user";
+import {querySingleUser, updateSingleUser} from "@/api/content/user";
 
 const {t} = useI18n();
 
@@ -153,6 +153,14 @@ const newPasswordAgain: Ref<string> = ref("");
 const address: Ref<string[]> = ref([] as string[]);
 const isShowUserAddress: Ref<boolean> = ref(true);
 const isShowModifyAddressArea: Ref<boolean> = ref(false);
+
+
+onBeforeMount(() => {
+
+  // 2024-8-8  21:34-每次用户查看个人信息都要更新一下本地用户数据信息为云端最新用户数据信息
+  refreshUserData();
+
+});
 
 
 onMounted(() => {
@@ -183,7 +191,7 @@ onMounted(() => {
  *
  * @author LiGuanda
  * @date 2024/2/12 下午 12:38:46
- * @filename Profile.vue
+ * @filename profile.vue
  * @description 用于提供用户的修改昵称操作
  *
  */
@@ -212,7 +220,18 @@ function submitRename() {
     userData.value.nickname = newNickname.value;
 
     updateSingleUser(userData.value)
-        .then(() => {
+        .then(res => {
+
+          // 2024-8-8  18:02-排除掉这种HTTP层面正常但业务层面执行失败的情况
+          if (!res?.data?.mysql_result?.isUpdated) {
+
+            ElMessage.error(t("content.profile.message.modifyNicknameFailed"));
+            userData.value.nickname = oldNickname;
+            userDataStore.updateUserData(userData.value);
+            newNickname.value = "" as string;
+            return;
+
+          }
 
           ElMessage({
 
@@ -244,7 +263,7 @@ function submitRename() {
  *
  * @author LiGuanda
  * @date 2024/2/12 下午 9:30:38
- * @filename Profile.vue
+ * @filename profile.vue
  * @description 用于提交修改密码的操作
  *
  */
@@ -280,7 +299,21 @@ function submitModifyPassword() {
 
   userData.value.password = newPassword.value;
   updateSingleUser(userData.value)
-      .then(() => {
+      .then(res => {
+
+        // 2024-8-8  18:01-排除掉这种HTTP层面正常但业务层面执行失败的情况
+        if (!res?.data?.mysql_result?.isUpdated) {
+
+          ElMessage.error(t("content.profile.message.modifyPasswordFailed"));
+
+          userData.value.password = oldPassword.value;
+          oldPassword.value = "" as string;
+          newPassword.value = "" as string;
+          newPasswordAgain.value = "" as string;
+          isShowModifyPasswordDialog.value = false;
+          return;
+
+        }
 
         ElMessage({
 
@@ -316,7 +349,7 @@ function submitModifyPassword() {
  *
  * @author Lenovo
  * @date 2024/2/13 下午 4:58:37
- * @filename Profile.vue
+ * @filename profile.vue
  * @description 用于提交修改用户家庭住址的操作
  *
  */
@@ -334,7 +367,21 @@ function submitModifyAddress() {
   userData.value.address = JSON.stringify(address.value);
 
   updateSingleUser(userData.value)
-      .then(() => {
+      .then(res => {
+
+        // 2024-8-8  17:55-排除掉这种HTTP层面正常但业务层面执行失败的情况
+        if (!res?.data?.mysql_result?.isUpdated) {
+
+          ElMessage.error(t("content.profile.message.modifyHomeAddressFailed"));
+
+          userData.value.address = oldAddress;
+          userDataStore.updateUserData(userData.value);
+          isShowUserAddress.value = true;
+          isShowModifyAddressArea.value = false;
+          return;
+
+        }
+
 
         ElMessage({
 
@@ -363,13 +410,43 @@ function submitModifyAddress() {
 }
 
 
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/8 PM 8:36:31
+ * @filename profile.vue
+ * @description 更新本地用户数据
+ *
+ */
+function refreshUserData() {
+
+  const userDataStore = UserDataStore();
+  if (userDataStore.localUserData && userDataStore.localUserData.id > 0) {
+
+    querySingleUser(userDataStore.localUserData.id).then(res => {
+
+      if (res?.data) {
+
+        userDataStore.updateUserData(res.data);
+        userData.value = res.data;
+
+      }
+
+    });
+
+  }
+
+}
+
+
 </script>
 
 
 <style scoped lang="scss">
 
-.userProfileContainer {
+.user-profile-container {
 
+  width: 100%;
   display: flex;
   flex-direction: column;
   background-color: white;

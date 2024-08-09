@@ -4,7 +4,7 @@
 
     <img
         class="logo-container"
-        src="../../../assets/logo.svg"
+        src="../../assets/logo.svg"
         alt="PTP LOGO"
         @click="jumpToUrl(PTP_WEB_SITE_URL)"
     />
@@ -26,9 +26,9 @@
         :content="isFullscreen?$t('common.bar.top.exitFullscreen'):$t('common.bar.top.enterFullscreen')"
         placement="bottom"
     >
-      <img v-if="!isFullscreen" @click="toggle" src="../../../assets/icons/fullscreen.svg" class="fullscreen-container"
+      <img v-if="!isFullscreen" @click="toggle" src="../../assets/icons/fullscreen.svg" class="fullscreen-container"
            :alt="$t('common.bar.top.enterFullscreen')"/>
-      <img v-else @click="toggle" src="../../../assets/icons/fullscreen-exit.svg" class="fullscreen-container"
+      <img v-else @click="toggle" src="../../assets/icons/fullscreen-exit.svg" class="fullscreen-container"
            :alt="$t('common.bar.top.exitFullscreen')"/>
     </el-tooltip>
 

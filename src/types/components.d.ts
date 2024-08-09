@@ -25,12 +25,12 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
-    Empty: typeof import('../components/status/empty/empty.vue')['default']
-    PageTabs: typeof import('../components/tsb/PageTabs.vue')['default']
+    Empty: typeof import('../pages/status/empty.vue')['default']
+    PageTabs: typeof import('@/components/tab/PageTabs.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('../components/bar/side/SideBar.vue')['default']
-    TopBar: typeof import('../components/bar/top/TopBar.vue')['default']
+    TopBar: typeof import('../layout/header/TopBar.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

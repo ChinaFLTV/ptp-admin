@@ -45,7 +45,7 @@
             <el-button @click="isShowUserAddress = true;isShowModifyAddressArea = false;"
                        style="margin-left: 3rem">{{ $t("common.button.cancel") }}
             </el-button>
-            <el-button type="primary" @click="submitModifyAddress">{{ $t("common.button.confirm") }}</el-button>
+            <el-button type="primary" @click="modifyAddress">{{ $t("common.button.confirm") }}</el-button>
 
           </div>
         </transition>
@@ -55,11 +55,11 @@
 
         <h3 class="profileKey">{{ $t("content.profile.avatar") }}</h3>
         <el-image class="avatar" ref="avatarRef"
-                  :src="JSON.parse(userData?.avatar).uri" :alt="t('content.profile.avatar')"
+                  :src="JSON.parse(userData?.avatar)?.uri" :alt="t('content.profile.avatar')"
                   :zoom-rate="1.2"
                   :max-scale="7"
                   :min-scale="0.2"
-                  :preview-src-list="[userData?.avatar]"
+                  :preview-src-list="[JSON.parse(userData?.avatar)?.uri]"
                   :initial-index="0"
                   fit="cover" lazy/>
         <h3 class="profileKey">{{ $t("content.profile.realname") }}</h3>
@@ -86,7 +86,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="isShowRenameDialog = false">{{ $t("common.button.cancel") }}</el-button>
-          <el-button type="primary" @click="submitRename">{{ $t("common.button.confirm") }}</el-button>
+          <el-button type="primary" @click="modifyNickname">{{ $t("common.button.confirm") }}</el-button>
         </div>
       </template>
 
@@ -106,7 +106,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="isShowModifyPasswordDialog = false">{{ $t("common.button.cancel") }}</el-button>
-          <el-button type="primary" @click="submitModifyPassword">{{ $t("common.button.confirm") }}</el-button>
+          <el-button type="primary" @click="modifyPassword">{{ $t("common.button.confirm") }}</el-button>
         </div>
       </template>
 
@@ -195,7 +195,7 @@ onMounted(() => {
  * @description 用于提供用户的修改昵称操作
  *
  */
-function submitRename() {
+function modifyNickname() {
 
   if (newNickname.value === "") {
 
@@ -241,6 +241,9 @@ function submitRename() {
             center: true
 
           });
+
+          // 2024-8-9  21:34-解决前后多次调用update方法只有第一次成功的BUG-更新一次并持久化回数据库时需要自增版本号
+          userData.value.version++;
           userDataStore.updateUserData(userData.value);
           newNickname.value = "" as string;
 
@@ -267,7 +270,7 @@ function submitRename() {
  * @description 用于提交修改密码的操作
  *
  */
-function submitModifyPassword() {
+function modifyPassword() {
 
   if (oldPassword.value === "" || newPassword.value === "" || newPasswordAgain.value === "") {
 
@@ -323,6 +326,9 @@ function submitModifyPassword() {
           center: true
 
         });
+
+        // 2024-8-9  21:35-解决前后多次调用update方法只有第一次成功的BUG-更新一次并持久化回数据库时需要自增版本号
+        userData.value.version++;
         userDataStore.updateUserData(userData.value);
         oldPassword.value = "" as string;
         newPassword.value = "" as string;
@@ -353,7 +359,7 @@ function submitModifyPassword() {
  * @description 用于提交修改用户家庭住址的操作
  *
  */
-function submitModifyAddress() {
+function modifyAddress() {
 
   if (userData.value.address === JSON.stringify(address.value)) {
 
@@ -391,6 +397,9 @@ function submitModifyAddress() {
           center: true
 
         });
+
+        // 2024-8-9  21:35-解决前后多次调用update方法只有第一次成功的BUG-更新一次并持久化回数据库时需要自增版本号
+        userData.value.version++;
         userDataStore.updateUserData(userData.value);
         isShowUserAddress.value = true;
         isShowModifyAddressArea.value = false;

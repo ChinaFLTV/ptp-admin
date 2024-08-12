@@ -132,3 +132,31 @@ export const refreshGeolocation = async (userId: number, addressInfo: AddressInf
     return await service.post(`${PTP_USER_BASE_URL}/refresh/geolocation/${userId}`, addressInfo);
 
 };
+
+
+/**
+ * @author LiGuanda
+ * @date 2024/8/12 PM 5:27:56
+ * @filename index.ts
+ * @description 更新用户当前的头像
+ * @param userId 当前的用户ID
+ * @param picture 用户的新的头像图片文件
+ * @returns 上传头像文件成功后的云文件的URI
+ */
+export const changeAvatar = async (userId: number, picture: File): Promise<Result<string>> => {
+
+    const formData: FormData = new FormData();
+    formData.set("userId", userId);
+    formData.set("picture", picture);
+
+    return await service.post(`${PTP_USER_BASE_URL}/update/avatar`, formData, {
+
+        headers: {
+
+            "Content-Type": "multipart/form-data"
+
+        }
+
+    });
+
+};

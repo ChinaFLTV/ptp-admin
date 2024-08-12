@@ -54,14 +54,19 @@
       <div class="halfProfileArea">
 
         <h3 class="profileKey">{{ $t("content.profile.avatar") }}</h3>
-        <el-image class="avatar" ref="avatarRef"
-                  :src="JSON.parse(userData?.avatar)?.uri" :alt="t('content.profile.avatar')"
-                  :zoom-rate="1.2"
-                  :max-scale="7"
-                  :min-scale="0.2"
-                  :preview-src-list="[JSON.parse(userData?.avatar)?.uri]"
-                  :initial-index="0"
-                  fit="cover" lazy/>
+        <div class="avatar-container">
+          <el-image class="avatar" ref="avatarRef"
+                    :src="JSON.parse(userData?.avatar)?.uri" :alt="t('content.profile.avatar')"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
+                    :preview-src-list="[JSON.parse(userData?.avatar)?.uri]"
+                    :initial-index="0"
+                    fit="cover" lazy/>
+          <span class="modify" @click="isShowChangeAvatarDialog = true">{{
+              $t("content.profile.changeAvatar")
+            }}</span>
+        </div>
         <h3 class="profileKey">{{ $t("content.profile.realname") }}</h3>
         <p class="profileValue">{{ desensitize(userData?.realname) }}</p>
         <h3 class="profileKey">{{ $t("content.profile.sex") }}</h3>
@@ -112,6 +117,47 @@
 
     </el-dialog>
 
+
+    <!--  2024-8-11  23:29-下面为头像更换对话框  -->
+    <el-dialog style="border-radius: 20px;" v-model="isShowChangeAvatarDialog"
+               :title="t('content.profile.changeAvatar')"
+               width="500" :show-close="false" draggable
+               center>
+
+      <div class="change-avatar-dialog-container">
+
+        <input type="file" accept="image/*" id="picture-input" ref="pictureInputRef" @change="handleFileChange">
+        <el-image class="change-avatar-dialog-item" style="height: 400px;" ref="choseNewAvatarRef"
+                  :src="newAvatarUri"
+                  :alt="t('content.profile.choseNewAvatar')" @click="pictureInputRef.click()"
+                  :zoom-rate="1.2"
+                  :max-scale="7"
+                  :min-scale="0.2"
+                  :initial-index="0"
+                  fit="cover" :style="{pointerEvents:isPictureChooserDisabled?'none':'auto'}" lazy>
+          <template #error>
+            <div class="change-avatar-dialog-avatar-slot-container"
+                 :style="{pointerEvents:isPictureChooserDisabled?'none':'auto'}"
+                 @click.prevent="pictureInputRef.click()">
+              <add-picture theme="filled" size="48" fill="#333"/>
+            </div>
+          </template>
+        </el-image>
+        <el-button class="change-avatar-dialog-item" type="primary" @click="confirmChangeAvatar"
+                   :loading="isConfirmChangeAvatarButtonLoading" :disabled="isConfirmChangeAvatarButtonDisabled">{{
+            $t("common.button.confirm")
+          }}
+        </el-button>
+        <el-button class="change-avatar-dialog-item" type="info" :disabled="isCancelChangeAvatarButtonDisabled"
+                   @click="cancelChangeAvatar">
+          {{ $t("common.button.cancel") }}
+        </el-button>
+
+      </div>
+
+    </el-dialog>
+
+
   </div>
 
 </template>
@@ -121,16 +167,19 @@
 
 
 import {UserDataStore} from "@/store/modules/user";
-import {desensitize} from "@/utils/desensitization";
 import {ElMessage} from "element-plus";
 import {pcaTextArr} from "element-china-area-data";
-import dayjs from "dayjs";
 import {CascaderOption} from "element-plus/lib/components";
 import {useI18n} from "vue-i18n";
 import {User} from "@/model/po/manage/User";
-import {Gender} from "@/enums/Gender";
 import {Ref} from "vue";
-import {querySingleUser, updateSingleUser} from "@/api/content/user";
+import {changeAvatar, querySingleUser, updateSingleUser} from "@/api/content/user";
+import {AddPicture} from "@icon-park/vue-next";
+import {Result} from "@/model/po/response/Result";
+import {desensitize} from "@/utils/desensitization";
+import dayjs from "dayjs";
+import {Gender} from "@/enums/Gender";
+
 
 const {t} = useI18n();
 
@@ -138,7 +187,8 @@ const {t} = useI18n();
 const avatarRef = ref(null);
 const creditRef = ref(null);
 const newNicknameRef = ref(null);
-
+const choseNewAvatarRef = ref(null);
+const pictureInputRef: Ref<HTMLInputElement> = ref(null);
 
 const userDataStore = UserDataStore();
 // 2024-2-11  10:57-能够进入当前页面，则用户一定已经登录了
@@ -146,6 +196,11 @@ const userData: Ref<User> = ref(userDataStore.getUserData() as User);
 const isShowRenameDialog: Ref<boolean> = ref(false);
 const newNickname: Ref<string> = ref("");
 const isShowModifyPasswordDialog: Ref<boolean> = ref(false);
+const isShowChangeAvatarDialog: Ref<boolean> = ref(false);
+const isPictureChooserDisabled: Ref<boolean> = ref(false);
+const isConfirmChangeAvatarButtonLoading: Ref<boolean> = ref(false);
+const isConfirmChangeAvatarButtonDisabled: Ref<boolean> = ref(false);
+const isCancelChangeAvatarButtonDisabled: Ref<boolean> = ref(false);
 const oldPassword: Ref<string> = ref("");
 const newPassword: Ref<string> = ref("");
 const newPasswordAgain: Ref<string> = ref("");
@@ -153,6 +208,57 @@ const newPasswordAgain: Ref<string> = ref("");
 const address: Ref<string[]> = ref([] as string[]);
 const isShowUserAddress: Ref<boolean> = ref(true);
 const isShowModifyAddressArea: Ref<boolean> = ref(false);
+// 2024-8-12  17:23-新头像的本地存储路径引用
+const newAvatarUri: Ref<string> = ref(undefined);
+// 2024-8-12  17:23-新头像的文件实体
+let newAvatarFile: File = undefined;
+
+
+// 2024-8-12  15:24-更改头像时 , 读取本地图片文件所需
+const fileReader: FileReader = new FileReader();
+fileReader.onload = e => {
+
+  newAvatarUri.value = e.target.result;
+
+};
+fileReader.onerror = err => {
+
+  ElMessage({
+
+    message: t("content.profile.message.fetchPictureError"),
+    showClose: true,
+    type: "error",
+    center: true
+
+  });
+  console.error(err);
+
+  newAvatarUri.value = undefined;
+  newAvatarFile = undefined;
+  isPictureChooserDisabled.value = false;
+  isConfirmChangeAvatarButtonDisabled.value = false;
+  isCancelChangeAvatarButtonDisabled.value = false;
+
+};
+fileReader.onabort = () => {
+
+  ElMessage({
+
+    message: t("content.profile.message.fetchPictureAbort"),
+    showClose: true,
+    type: "warning",
+    center: true
+
+  });
+  console.warn(err);
+
+  newAvatarUri.value = undefined;
+  newAvatarFile = undefined;
+  isPictureChooserDisabled.value = false;
+  isConfirmChangeAvatarButtonDisabled.value = false;
+  isCancelChangeAvatarButtonDisabled.value = false;
+
+};
 
 
 onBeforeMount(() => {
@@ -183,6 +289,13 @@ onMounted(() => {
     creditRef.value.style.backgroundColor = "#ffa2a270";
 
   }
+
+});
+
+
+onUnmounted(() => {
+
+  fileReader?.abort();
 
 });
 
@@ -448,6 +561,127 @@ function refreshUserData() {
 }
 
 
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/12 PM 4:34:44
+ * @filename profile.vue
+ * @description 当图片选择元素中的文件列表出现变动时被触发(主要用于预览用户选择的本地图片)
+ *
+ */
+function handleFileChange(event: Event) {
+
+  const file: File = event.target.files[0];
+  if (file) {
+
+    newAvatarFile = file;
+    fileReader.readAsDataURL(file);
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/11 PM 10:20:29
+ * @filename profile.vue
+ * @description 更换用户头像
+ *
+ */
+async function confirmChangeAvatar() {
+
+  try {
+
+    isPictureChooserDisabled.value = true;
+    isConfirmChangeAvatarButtonLoading.value = true;
+    isConfirmChangeAvatarButtonDisabled.value = true;
+    isCancelChangeAvatarButtonDisabled.value = true;
+
+    const userId: number = userData.value?.id;
+
+    const res: Result<string> = await changeAvatar(userId, newAvatarFile);
+    const newAvatarUri: string = res.data;
+
+    // 2024-8-12  17:47-表明更新头像成功了
+    if (newAvatarUri) {
+
+      // 2024-8-12  17:48-为了避免本地自行修改字段而可能导致本地版本号与云端版本号不匹配的问题 , 这里统一直接从云端再拉取一份新的用户数据
+      const newUser: Result<User> = await querySingleUser(userId);
+
+      if (newUser.data) {
+
+        userDataStore.updateUserData(newUser.data);
+        userData.value = newUser.data;
+
+        ElMessage({
+
+          message: t("content.profile.message.changeAvatarSucceeded"),
+          showClose: true,
+          type: "success",
+          center: true
+
+        });
+
+        // 2024-8-12  20:05-置相关状态资源为undefined
+        cancelChangeAvatar();
+
+      }
+
+    }
+
+  } catch (err) {
+
+    newAvatarUri.value = undefined;
+    newAvatarFile = undefined;
+    isConfirmChangeAvatarButtonLoading.value = false;
+    isConfirmChangeAvatarButtonDisabled.value = false;
+    isCancelChangeAvatarButtonDisabled.value = false;
+
+    ElMessage({
+
+      message: t("content.profile.message.changeAvatarFailed"),
+      showClose: true,
+      type: "error",
+      center: true
+
+    });
+
+    console.error(err.message);
+
+  } finally {
+
+    isPictureChooserDisabled.value = false;
+    isConfirmChangeAvatarButtonLoading.value = false;
+    isConfirmChangeAvatarButtonDisabled.value = false;
+    isCancelChangeAvatarButtonDisabled.value = false;
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/12 PM 5:26:05
+ * @filename profile.vue
+ * @description  取消更换头像
+ *
+ */
+function cancelChangeAvatar() {
+
+  isConfirmChangeAvatarButtonLoading.value = false;
+  isConfirmChangeAvatarButtonDisabled.value = false;
+  isCancelChangeAvatarButtonDisabled.value = false;
+  isShowChangeAvatarDialog.value = false;
+  newAvatarUri.value = undefined;
+  newAvatarFile = undefined;
+
+}
+
+
 </script>
 
 
@@ -508,16 +742,25 @@ function refreshUserData() {
 
     }
 
-    .avatar {
+    .avatar-container {
 
-      display: inline-block;
-      width: 100px;
-      height: 100px;
+      display: flex;
+      flex-direction: row;
+      justify-content: start;
+      align-items: center;
       margin: 2rem auto 2rem auto;
 
-      &:hover {
+      .avatar {
 
-        cursor: pointer;
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+
+        &:hover {
+
+          cursor: pointer;
+
+        }
 
       }
 
@@ -528,6 +771,40 @@ function refreshUserData() {
   .modifyPasswordLabel {
 
     margin: 1.5rem 0 1.5rem 0;
+
+  }
+
+  .change-avatar-dialog-container {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    #picture-input {
+
+      display: none;
+
+    }
+
+    .change-avatar-dialog-item {
+
+      display: block;
+      margin: 10px 10px 10px; // 2024-8-12  10:51-覆盖ElementUI plus中的默认margin配置
+      width: 400px;
+      height: 50px;
+      letter-spacing: 4px;
+
+      .change-avatar-dialog-avatar-slot-container {
+
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+      }
+
+    }
 
   }
 

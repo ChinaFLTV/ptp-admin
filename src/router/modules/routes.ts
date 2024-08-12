@@ -10,6 +10,7 @@ import Login from "@/pages/login/login.vue";
 import MainPage from "@/layout/MainLayout.vue";
 import Profile from "@/pages/profile/profile.vue";
 import Empty from "@/pages/status/empty.vue";
+import ChatRoom from "@/pages/chat/room/ChatRoom.vue";
 
 
 export const routes = [
@@ -41,6 +42,19 @@ export const routes = [
                 meta: {
 
                     titleKey: "common.bar.top.profile"
+
+                }
+
+            },
+            {
+
+                // 2024-8-11  16:19-聊天室界面
+                path: "chat-room",
+                name: "chat-room",
+                component: ChatRoom,
+                meta: {
+
+                    titleKey: "common.bar.top.chatRoom"
 
                 }
 

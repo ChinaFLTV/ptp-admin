@@ -1,13 +1,14 @@
 <template>
 
   <!--  2024-1-16  22:33-不可见组件  -->
-  <el-dialog style="border-radius: 20px" width="25%" :title="t('content.contactUs.dialog.title')" draggable center
-             close-on-press-escape
-             append-to-body>
+  <el-dialog style="border-radius: 20px;" width="25%"
+             :title="t('content.contactUs.dialog.title')" draggable
+             center
+             close-on-press-escape append-to-body>
 
-    <div class="contact-us-dialog-container">
+    <div class="contact-us-dialog-content-container">
 
-      <el-text type="primary">{{ $t("content.contactUs.dialog.content")}}</el-text>
+      <el-text type="primary">{{ $t("content.contactUs.dialog.content") }}</el-text>
       <el-image style="width:300px" src="src/assets/image/qq_qrcode.jpg" alt="达哥QQ二维码"/>
 
     </div>
@@ -28,7 +29,9 @@ const {t} = useI18n();
 
 <style scoped lang="scss">
 
-.contact-us-dialog-container {
+@use "@/style/dimensions" as *;
+
+.contact-us-dialog-content-container {
 
   display: flex;
   flex-direction: column;

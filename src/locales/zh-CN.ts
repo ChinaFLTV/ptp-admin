@@ -25,6 +25,7 @@ export default {
             top: {
 
                 appTitle: "PTP后台管理平台",
+                chatRoom: "聊天室",
                 contactUs: "与我们联系",
                 enterFullscreen: "全屏",
                 exitFullscreen: "退出全屏",
@@ -100,6 +101,8 @@ export default {
             homeAddress: "家庭住址",
             changeHomeAddress: "修改地址",
             avatar: "用户头像",
+            changeAvatar: "更换头像",
+            choseNewAvatar: "已选中的新头像图片",
             realname: "真实姓名",
             sex: "性别",
             sex_male: "男",
@@ -120,7 +123,11 @@ export default {
                 modifyPasswordFailed: "修改密码失败",
                 newHomeAddressIsTheSameAsOldHomeAddress: "新地址与旧地址相同",
                 modifyHomeAddressSucceeded: "修改地址成功",
-                modifyHomeAddressFailed: "修改地址失败"
+                modifyHomeAddressFailed: "修改地址失败",
+                changeAvatarSucceeded: "更换头像成功",
+                changeAvatarFailed: "更换头像失败",
+                fetchPictureAbort: "获取本地图片的过程被中断",
+                fetchPictureError: "获取本地图片的过程中出现错误"
 
             }
 

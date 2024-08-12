@@ -10,10 +10,20 @@
 export class PtpException extends Error {
 
 
-    code?: number; // 错误码为8xx
-    message?: string;
-    subMessage?: string; // 二级消息(一般面向开发人员，不对用户公布该消息)
-    additionalData?: any; // 额外数据
+    code: number; // 错误码为8xx
+    message: string; // 2024-8-11  15:13-异常信息
+    subMessage: string; // 二级消息(一般面向开发人员，不对用户公布该消息)
+    additionalData: any; // 额外数据
+
+
+    constructor(code: number, message: string, subMessage: string = "") {
+
+        super();
+        this.code = code;
+        this.message = message;
+        this.subMessage = subMessage;
+
+    }
 
 
 }

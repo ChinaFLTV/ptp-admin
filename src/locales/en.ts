@@ -23,6 +23,7 @@ export default {
             top: {
 
                 appTitle: "PTP Background Management Platform",
+                chatRoom: "Chat Room",
                 contactUs: "Contact Us",
                 enterFullscreen: "Enter Fullscreen",
                 exitFullscreen: "Exit Fullscreen",
@@ -97,6 +98,8 @@ export default {
             homeAddress: "Home Address",
             changeHomeAddress: "Change Address",
             avatar: "User Avatar",
+            choseNewAvatar: "The new avatar picture that has been chose",
+            changeAvatar: "Change Avatar",
             realname: "Real Name",
             sex: "Gender",
             sex_male: "Male",
@@ -117,7 +120,11 @@ export default {
                 modifyPasswordFailed: "Modify password failed",
                 newHomeAddressIsTheSameAsOldHomeAddress: "New home address is the same as the old home address",
                 modifyHomeAddressSucceeded: "Modify home address succeeded",
-                modifyHomeAddressFailed: "Modify home address failed"
+                modifyHomeAddressFailed: "Modify home address failed",
+                changeAvatarSucceeded: "Change avatar succeeded",
+                changeAvatarFailed: "Change avatar failed",
+                fetchPictureAbort: "The process of obtaining the local image is interrupted",
+                fetchPictureError: "An error occurred while obtaining the local image"
 
             }
 

@@ -45,7 +45,6 @@ import {UserDataStore} from "@/store/modules/user";
 import {NavigationType} from "@/enums/NavigationType";
 import {useI18n} from "vue-i18n";
 import {loginByNicknameAndPassword} from "@/api/content/user/login";
-import {User} from "@/model/po/manage/User";
 
 const {t} = useI18n();
 

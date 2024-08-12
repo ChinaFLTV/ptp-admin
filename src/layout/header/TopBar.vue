@@ -15,6 +15,12 @@
       </span>
     </wave-view>
 
+    <span class="top-bar-item-container" @click="jumpChatRoomPage">
+      <wechat class="top-bar-item-icon-container" theme="multi-color" size="24"
+              :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+      <span class="top-bar-item-text-container">{{ $t("common.bar.top.chatRoom") }}</span>
+    </span>
+
     <div class="flex-grow-spacer"/>
 
     <span class="contact-us-container"
@@ -92,7 +98,7 @@ import WaveView from "@/components/animation/WaveView.vue";
 import {PTP_WEB_SITE_URL} from "@/constants/web";
 import {LoginClientType} from "@/enums/LoginClientType";
 import {logout} from "@/api/content/user/login";
-
+import {Wechat} from "@icon-park/vue-next";
 
 const welcomeUserNameRef = ref(null);
 const avatarRef = ref(null);
@@ -110,6 +116,25 @@ const emits = defineEmits(["hideComponent"]);
 const {changeLocale} = useLocale();
 
 const {t} = i18n.global;
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/11 PM 4:17:11
+ * @filename TopBar.vue
+ * @description 跳转至聊天室页面
+ *
+ */
+function jumpChatRoomPage() {
+
+  router.push({
+
+    name: "chat-room"
+
+  });
+
+}
 
 
 // 2024-2-7  16:18-登录登出回调函数
@@ -239,6 +264,8 @@ defineExpose({
 
 <style lang="scss" scoped>
 
+@use "@/style/dimensions" as *;
+
 .top-bar-container {
 
   display: flex;
@@ -287,6 +314,28 @@ defineExpose({
         user-select: none;
 
       }
+
+    }
+
+  }
+
+
+  .top-bar-item-container {
+
+    @extend .common-decor;
+    display: flex;
+    align-items: center;
+
+    .top-bar-item-icon-container {
+
+      margin-top: $top-bar-item-icon-vertical-spacer-width;
+
+    }
+
+    .top-bar-item-text-container {
+
+      margin-left: $top-bar-item-icon-text-spacer-width;
+      user-select: none; // 2024-8-11  16:42-禁止功能选项的标题被文本选择和复制
 
     }
 

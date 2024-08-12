@@ -11,7 +11,7 @@ import {setupStore} from "@/store";
 import {setupCustomDirectives} from "@/directives";
 import {setupRouter} from "@/router";
 import {setupElementPlus} from "@/plugins/elementPlus";
-
+import {install} from "@icon-park/vue-next/es/all";
 
 /**
  *
@@ -44,6 +44,9 @@ function configPlugins(app: VueApp<Element>) {
 
     // 2024-2-13  14:37-引入地址选择器组件v-distpicker
     //app.component("v-distpicker", Distpicker);
+
+    // 2024-8-11  15:21-全局安装IconPark图标
+    install(app);
 
     app.mount("#main-area");
 

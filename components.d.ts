@@ -26,6 +26,7 @@ declare module 'vue' {
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Empty: typeof import('@/pages/status/empty.vue')['default']
+    OnlineDot: typeof import('./src/components/user/OnlineDot.vue')['default']
     PageTabs: typeof import('./src/components/tab/PageTabs.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

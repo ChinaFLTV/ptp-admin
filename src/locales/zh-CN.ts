@@ -82,6 +82,12 @@ export default {
     },
     content: {
 
+        chatRoom: {
+
+            chatRoomName: "未知房间号",
+            groupMember: "群成员"
+
+        },
         profile: {
 
             id: "用户唯一ID",

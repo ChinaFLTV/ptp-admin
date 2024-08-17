@@ -250,7 +250,6 @@ fileReader.onabort = () => {
     center: true
 
   });
-  console.warn(err);
 
   newAvatarUri.value = undefined;
   newAvatarFile = undefined;

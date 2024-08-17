@@ -27,7 +27,6 @@
 import TopBar from "@/layout/header/TopBar.vue";
 import {onMounted} from "vue";
 import {ElMessage} from "element-plus";
-import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/modules/user";
 import {useI18n} from "vue-i18n";
 import {User} from "@/model/po/manage/User";
@@ -40,7 +39,6 @@ const topBarRef = ref(null);
 const isShowTopBar = ref(false);
 const isShowContentArea = ref(false);
 
-const router = useRouter();
 const userDataStore = UserDataStore();
 const localUserData = ref(null as User);
 
@@ -147,6 +145,8 @@ $content_height: calc(100vh - 10px - $topBar_height - 10px - 10px);
 
   .main-content-container {
 
+    display: grid;
+    place-items: center;
     max-height: $content_height;
     border-radius: 10px;
     margin: 5px 10px 10px 10px;

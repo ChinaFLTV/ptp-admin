@@ -79,6 +79,12 @@ export default {
     },
     content: {
 
+        chatRoom: {
+
+            chatRoomName: "Unknown Room Name",
+            groupMember: "Group Member"
+
+        },
         profile: {
 
             id: "User Unique ID",

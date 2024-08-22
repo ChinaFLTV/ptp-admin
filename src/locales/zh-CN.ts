@@ -85,7 +85,9 @@ export default {
         chatRoom: {
 
             chatRoomName: "未知房间号",
-            groupMember: "群成员"
+            groupMember: "群成员",
+            chatInputPlaceholder: "善语结善缘，恶言伤人心~(拖动、粘贴文件到此，可发送文件)",
+            messageContentIsEmpty: "消息内容为空!"
 
         },
         profile: {

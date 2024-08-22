@@ -7,32 +7,63 @@
         <div class="room-name-container">{{ roomName ? roomName : $t("content.chatRoom.chatRoomName") }}</div>
       </div>
       <div class="message-content-container">
-        <el-scrollbar>
-          <div v-for="message in groupMessages" :key="message.id" class="group-message-info-container">
-            <el-avatar :size="40" :src="message.senderAvatarUrl" :alt="message.senderNickname">
-              {{ message.senderNickname }}
-            </el-avatar>
-            <div class="group-message-content-container">
-              <div class="group-message-nickname-info-container">
-                <span>{{ message.senderNickname }}</span>
-                <span class="group-message-datetime-info-container">{{
-                    dayjs(message.dateTime).format("MM/DD HH:mm:ss")
-                  }}</span>
+        <el-scrollbar ref="chatMessageRef">
+          <div ref="chatMessageInnerRef">
+            <div v-for="message in groupMessages" :key="message.id"
+                 :class="['group-message-info-container', message.senderId===userDataStore.localUserData.id?'reversed':'']">
+              <el-avatar :size="40" :src="message.senderAvatarUrl" :alt="message.senderNickname">
+                {{ message.senderNickname }}
+              </el-avatar>
+              <div class="group-message-content-container">
+                <div class="group-message-nickname-info-container">
+                  <span style="color: #a6a9ad;">{{ message.senderNickname }}</span>
+                  <span class="group-message-senderId-info-container">({{ message.senderId }})</span>
+                  <span class="group-message-datetime-info-container">{{
+                      dayjs(message.dateTime).format("MM/DD HH:mm:ss")
+                    }}</span>
+                </div>
+                <div class="group-message-content-info-container">{{ message.content }}</div>
               </div>
-              <div class="group-message-content-info-container">{{ message.content }}</div>
             </div>
           </div>
         </el-scrollbar>
       </div>
-      <div class="message-input-container"></div>
+      <div class="message-input-container">
+        <div class="message-extension-container">
+          <emotion-happy theme="multi-color" size="20" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+          <picture-album theme="multi-color" style="margin-left: 10px;" size="20"
+                         :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+          <file-addition theme="multi-color" style="margin-left: 10px;" size="20"
+                         :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+        </div>
+        <div class="message-input-bottom-half-container">
+          <el-input
+              ref="chatInputRef"
+              style="border: none;"
+              class="message-input-component"
+              v-model="messageContent"
+              type="textarea"
+              rows="3"
+              resize="none"
+              :placeholder="t('content.chatRoom.chatInputPlaceholder')"
+              maxlength="500"
+              @keyup.enter="sendMessage"
+              show-word-limit
+          />
+          <Telegram @click="sendMessage" class="send-message-icon" theme="filled" size="20" fill="#a6a9ad"/>
+        </div>
+      </div>
     </div>
 
     <div class="contact-container">
 
       <div class="contact-top-bar-container">
-        <div style="margin-left: 15px;">{{ $t("content.chatRoom.groupMember") }}</div>
-        <div style="margin: 0 5px;">·</div>
-        <div>1 / 155</div>
+        <div style="margin-left: 15px;color: #E5EAF3;">{{
+            $t("content.chatRoom.groupMember")
+          }}
+        </div>
+        <div style="margin: 0 5px;color: #E5EAF3;">·</div>
+        <div style="color: #E5EAF3;">1 / 155</div>
       </div>
 
       <div class="contact-list-container">
@@ -65,12 +96,21 @@
 
 
 import {Ref} from "vue";
-import {t} from "@/hooks/web/useI18n";
+import {useI18n} from "@/hooks/web/useI18n";
 import {GroupMember, GroupMessage} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
+import {EmotionHappy, FileAddition, PictureAlbum, Telegram} from "@icon-park/vue-next";
+import {ElMessage} from "element-plus";
+import randomUUID from "@/utils/uuid";
 
 
+const chatMessageRef: Ref = ref(null);
+const chatMessageInnerRef: Ref = ref(null);
+const chatInputRef: Ref = ref(null);
+
+
+const {t} = useI18n();
 const userDataStore = UserDataStore();
 
 
@@ -150,7 +190,56 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
     dateTime: new Date("2024-08-16T10:30:00Z"),
     type: 1
   }]);
+// 2024-8-20  23:25-用户待发送的消息内容
+const messageContent: Ref<string> = ref("");
 
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/21 PM 11:56:13
+ * @filename ChatRoom.vue
+ * @description 发送群聊消息
+ *
+ */
+function sendMessage() {
+
+  if (messageContent.value.trim() == "") {
+
+    ElMessage({
+
+      message: t("content.chatRoom.messageContentIsEmpty"),
+      showClose: true,
+      type: "warning",
+      center: true
+
+    });
+    return;
+
+  }
+
+  groupMessages.value.push({
+
+    id: randomUUID(),
+    content: messageContent.value,
+    senderId: userDataStore.localUserData.id,
+    senderNickname: userDataStore.localUserData.nickname,
+    senderAvatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
+    receiverId: -1,
+    dateTime: new Date()
+
+  } as GroupMessage);
+
+  nextTick(() => {
+
+    const scrollTop: number = chatMessageInnerRef.value.clientHeight - chatMessageRef.value.wrapRef.clientHeight;
+    chatMessageRef.value.setScrollTop(chatMessageInnerRef.value.clientHeight);
+
+  });
+
+  messageContent.value = "";
+
+}
 
 </script>
 
@@ -159,6 +248,10 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
 
 @use "@/style/dimensions" as *;
 @use "@/style/themes/default" as *;
+
+$dark-background: #323644;
+$dark-primary-text: #E5EAF3;
+$dark-secondary-text: #a6a9ad;
 
 .chat-room-container {
 
@@ -187,14 +280,16 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
       align-items: center;
       width: 100%;
       height: 60px;
-      background-color: blueviolet;
+      background-color: $dark-background;
       border-radius: $global-dialog-radius $global-dialog-radius 0 0;
+      border-bottom: 1px solid #272A37;
 
       .room-name-container {
 
         font-size: $global-middle-window-primary-font-size;
         letter-spacing: $global-middle-window-primary-letter-spacing;
         font-weight: bold;
+        color: $dark-primary-text;
 
       }
 
@@ -203,9 +298,10 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
     .message-content-container {
 
       width: 100%;
+      height: 500px; // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
       flex-grow: 1;
-      background-color: darksalmon;
-      padding: 20px;
+      background-color: $dark-background;
+      padding: 20px 0;
 
       .group-message-info-container {
 
@@ -213,7 +309,8 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
         flex-direction: row;
         justify-content: start;
         align-items: start;
-        margin: 10px 0;
+        margin: 20px 0 0 0;
+        padding: 0 20px;
 
         .group-message-content-container {
 
@@ -230,6 +327,12 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
             align-items: center;
             font-size: 12px;
             margin-bottom: 2px;
+
+            .group-message-senderId-info-container {
+
+              display: none;
+
+            }
 
             .group-message-datetime-info-container {
 
@@ -253,13 +356,55 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
 
             .group-message-nickname-info-container {
 
+              .group-message-senderId-info-container {
+
+                color: $dark-secondary-text;
+                display: inline;
+
+              }
+
               .group-message-datetime-info-container {
 
+                color: $dark-secondary-text;
                 display: inline;
 
               }
 
             }
+
+          }
+
+        }
+
+      }
+
+      .reversed {
+
+        flex-direction: row-reverse;
+        justify-content: end;
+
+        .group-message-content-container {
+
+          align-items: end;
+          margin-right: 10px;
+
+          .group-message-nickname-info-container {
+
+            flex-direction: row-reverse;
+            justify-content: end;
+
+            .group-message-datetime-info-container {
+
+              margin-right: 10px;
+
+            }
+
+          }
+
+          .group-message-content-info-container {
+
+            border-radius: 20px 0 20px 20px;
+            padding: 5px 10px 5px 15px;
 
           }
 
@@ -273,8 +418,61 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
 
       height: 120px;
       width: 100%;
-      background-color: crimson;
+      padding: 15px;
+      background-color: $dark-background;
       border-radius: 0 0 $global-dialog-radius $global-dialog-radius;
+      border-top: 1px solid #272A37;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .message-extension-container {
+
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+
+      }
+
+      .message-input-bottom-half-container {
+
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: end;
+
+        ::v-deep(.el-textarea__inner) {
+
+          padding: 0;
+          box-shadow: none;
+          border: none;
+          background-color: transparent;
+          color: #BFBBB4;
+
+        }
+
+        ::v-deep(.el-input__count) {
+
+          background-color: transparent;
+
+        }
+
+        .message-input-component {
+
+          font-size: 16px;
+
+        }
+
+        .send-message-icon {
+
+          margin-left: 10px;
+          cursor: pointer;
+
+        }
+
+      }
 
     }
 
@@ -299,9 +497,9 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
       align-items: center;
       width: 100%;
       height: $top-bar-height;
-      background-color: darkorange;
       border-radius: $global-dialog-radius $global-dialog-radius 0 0;
-      color: $global-text-color-primary;
+      border-bottom: 1px solid #272A37;
+      background-color: $dark-background;
 
     }
 
@@ -310,9 +508,9 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
       width: 100%;
       height: calc(720px - #{$top-bar-height});
       flex-grow: 1;
-      background-color: fuchsia;
       border-radius: 0 0 $global-dialog-radius $global-dialog-radius;
       padding: 10px 10px;
+      background-color: $dark-background;
 
       .group-member-info-container {
 
@@ -326,8 +524,8 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
         &:hover {
 
           color: #E5EAF3;
-          background-color: #484d5f;
           border-radius: 10px;
+          background-color: #484D5F;
 
         }
 
@@ -339,6 +537,7 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          color: #a6a9ad;
 
         }
 

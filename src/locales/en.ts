@@ -82,7 +82,9 @@ export default {
         chatRoom: {
 
             chatRoomName: "Unknown Room Name",
-            groupMember: "Group Member"
+            groupMember: "Group Member",
+            chatInputPlaceholder: "Good words bind good ties,bad words hurt people~(Drag and paste the file here,you can send the file)",
+            messageContentIsEmpty: "The message content is empty!"
 
         },
         profile: {

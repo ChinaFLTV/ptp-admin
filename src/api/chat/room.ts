@@ -7,6 +7,10 @@
  *
  */
 
+import {PTP_USER_CHAT_BASE_URL} from "@/constants/web";
+import {service} from "@/config/axios/service";
+import {Result} from "@/model/po/response/Result";
+
 /**
  *
  * @author Lenovo/LiGuanda
@@ -45,7 +49,43 @@ export interface GroupMessage {
     senderAvatarUrl?: string; // 2024-8-15  22:37-发送者头像URL
     receiverId?: number; // 2024-8-15  22:38-接受者ID(-1则为全部聊天成员接收)
     dateTime: Date; // 2024-8-15  22:39-消息发送时间
-    type: number; // 2024-8-15  22:39-消息类型
+    type: MessageType; // 2024-8-15  22:39-消息类型
 
 
 }
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/23 PM 7:38:41
+ * @filename room.ts
+ * @description 消息类型
+ *
+ */
+export enum MessageType {
+
+
+    GROUP_CHAT = 1701,
+    PRIVATE_CHAT = 1702,
+    SYSTEM = 1703,
+    UNKNOWN = 1704
+
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/23 PM 3:59:01
+ * @filename room.ts
+ * @param id {number} 房间号
+ * @description 查询指定房间号的群聊房间信息
+ *
+ */
+export const querySingleChatRoom = async (id: number): Promise<Result<Map<string, any>>> => {
+
+    return await service.get(`${PTP_USER_CHAT_BASE_URL}/query/population/${id}`);
+
+};

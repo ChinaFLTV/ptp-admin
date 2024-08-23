@@ -50,14 +50,14 @@ service.interceptors.response.use(
             if (response.data.status === ResponseStatus.FAILURE) {
 
                 // 2024-8-8  17:45-将响应包装为异常给后续业务调用
-                throw new PtpException(response.data);
+                throw new PtpException(802, response.data);
 
             }
             return response.data;
 
         }
 
-        throw new PtpException("Invalid response data!");
+        throw new PtpException(801, "Invalid response data!");
 
     }
 );

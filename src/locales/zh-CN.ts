@@ -87,7 +87,12 @@ export default {
             chatRoomName: "未知房间号",
             groupMember: "群成员",
             chatInputPlaceholder: "善语结善缘，恶言伤人心~(拖动、粘贴文件到此，可发送文件)",
-            messageContentIsEmpty: "消息内容为空!"
+            messageContentIsEmpty: "消息内容为空!",
+            enterRoom: "正在进入房间...",
+            enterRoomFailed: "进入房间失败",
+            chatError: "聊天系统异常",
+            exitRoom: "您 离开了房间",
+            systemBroadcast: "系统广播"
 
         },
         profile: {

@@ -84,7 +84,12 @@ export default {
             chatRoomName: "Unknown Room Name",
             groupMember: "Group Member",
             chatInputPlaceholder: "Good words bind good ties,bad words hurt people~(Drag and paste the file here,you can send the file)",
-            messageContentIsEmpty: "The message content is empty!"
+            messageContentIsEmpty: "The message content is empty!",
+            enterRoom: "Entering the room...",
+            enterRoomFailed: "Room entry failure",
+            chatError: "Chat system exception",
+            exitRoom: "You left the room",
+            systemBroadcast: "System Broadcast"
 
         },
         profile: {

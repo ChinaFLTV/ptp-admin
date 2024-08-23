@@ -97,12 +97,18 @@
 
 import {Ref} from "vue";
 import {useI18n} from "@/hooks/web/useI18n";
-import {GroupMember, GroupMessage} from "@/api/chat/room";
+import {GroupMember, GroupMessage, MessageType} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
 import {EmotionHappy, FileAddition, PictureAlbum, Telegram} from "@icon-park/vue-next";
 import {ElMessage} from "element-plus";
 import randomUUID from "@/utils/uuid";
+import {
+  DEFAULT_CHAT_ROOM_ID,
+  PTP_USER_CHAT_BASE_URL,
+  PTP_WEB_CONTEXT_URL,
+  PTP_WEB_SITE_WEBSOCKET_URL
+} from "@/constants/web";
 
 
 const chatMessageRef: Ref = ref(null);
@@ -115,84 +121,17 @@ const userDataStore = UserDataStore();
 
 
 // 2024-8-13  21:55-聊天室的房间名称
-const roomName: Ref<string> = ref(t(""));
+const roomName: Ref<string> = ref(t("content.chatRoom.chatRoomName"));
 // 2024-8-14  22:44-聊天室在线用户信息列表
-const groupMembers: Ref<Array<GroupMember>> = ref([{
-
-  id: userDataStore.localUserData.id,
-  avatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
-  nickname: userDataStore.localUserData.nickname,
-  isOnline: true
-
-} as GroupMember, {
-
-  id: userDataStore.localUserData.id,
-  avatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
-  nickname: userDataStore.localUserData.nickname,
-  isOnline: false
-
-} as GroupMember, {
-
-  id: userDataStore.localUserData.id,
-  avatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
-  nickname: "这是一非常非常非常非常非常非常非常非常非常非常非常非常长的昵称",
-  isOnline: true
-
-} as GroupMember]);
+const groupMembers: Ref<Array<GroupMember>> = ref([]);
 // 2024-8-16  21:02-群聊消息(包括部分历史消息)
-const groupMessages: Ref<GroupMessage[]> = ref([{
-  id: 1,
-  content: "Hey everyone, how's it going?",
-  senderId: 101,
-  senderNickname: "Alice",
-  senderAvatarUrl: "https://example.com/avatar/alice.png",
-  receiverId: -1,
-  dateTime: new Date("2024-08-16T10:15:00Z"),
-  type: 1
-},
-  {
-    id: 2,
-    content: "All good here! Working on the new project.",
-    senderId: 102,
-    senderNickname: "Bob",
-    senderAvatarUrl: "https://example.com/avatar/bob.png",
-    receiverId: -1,
-    dateTime: new Date("2024-08-16T10:17:00Z"),
-    type: 1
-  },
-  {
-    id: 3,
-    content: "Don't forget about the meeting at 3 PM.",
-    senderId: 103,
-    senderNickname: "Charlie",
-    senderAvatarUrl: "https://example.com/avatar/charlie.png",
-    receiverId: -1,
-    dateTime: new Date("2024-08-16T10:20:00Z"),
-    type: 1
-  },
-  {
-    id: 4,
-    content: "Can someone review my latest commit?",
-    senderId: 101,
-    senderNickname: "Alice",
-    senderAvatarUrl: "https://example.com/avatar/alice.png",
-    receiverId: -1,
-    dateTime: new Date("2024-08-16T10:25:00Z"),
-    type: 1
-  },
-  {
-    id: 5,
-    content: "你们说的啥呀？我咋听不懂捏",
-    senderId: 102,
-    senderNickname: "Bob",
-    senderAvatarUrl: "https://example.com/avatar/bob.png",
-    receiverId: -1,
-    dateTime: new Date("2024-08-16T10:30:00Z"),
-    type: 1
-  }]);
+const groupMessages: Ref<GroupMessage[]> = ref([]);
 // 2024-8-20  23:25-用户待发送的消息内容
 const messageContent: Ref<string> = ref("");
 
+
+// 2024-8-23  20:44-用于与后端WebSocket服务器进行交互的WebSocket客户端
+const chatRoomClient: WebSocket = new WebSocket(`${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`);
 
 /**
  *
@@ -202,7 +141,7 @@ const messageContent: Ref<string> = ref("");
  * @description 发送群聊消息
  *
  */
-function sendMessage() {
+async function sendMessage() {
 
   if (messageContent.value.trim() == "") {
 
@@ -214,11 +153,15 @@ function sendMessage() {
       center: true
 
     });
+
+    // 2024-8-23  23:38-避免在持续回车的情况下发送消息导致消息发送失败而消息输入框中的内容出现多行文字的情况
+    messageContent.value = "";
+
     return;
 
   }
 
-  groupMessages.value.push({
+  const newMessage: GroupMessage = {
 
     id: randomUUID(),
     content: messageContent.value,
@@ -226,18 +169,114 @@ function sendMessage() {
     senderNickname: userDataStore.localUserData.nickname,
     senderAvatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
     receiverId: -1,
-    dateTime: new Date()
+    dateTime: new Date(),
+    type: MessageType.GROUP_CHAT
 
-  } as GroupMessage);
+  };
 
-  nextTick(() => {
+  chatRoomClient.send(JSON.stringify(newMessage));
 
-    const scrollTop: number = chatMessageInnerRef.value.clientHeight - chatMessageRef.value.wrapRef.clientHeight;
-    chatMessageRef.value.setScrollTop(chatMessageInnerRef.value.clientHeight);
+  messageContent.value = "";
+
+
+}
+
+chatRoomClient.addEventListener("open", () => {
+
+  ElMessage({
+
+    message: t("content.chatRoom.enterRoom"),
+    showClose: true,
+    type: "success",
+    center: true
 
   });
 
-  messageContent.value = "";
+});
+
+chatRoomClient.addEventListener("message", event => {
+
+  const wrappedMsgDataMap = JSON.parse(event.data);
+  const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
+
+  // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
+  if (groupMessage.type == MessageType.SYSTEM) {
+
+    groupMessage.senderId = -1;
+    groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
+    groupMessage.senderAvatarUrl = "src/assets/icons/broadcast.svg";
+
+  }
+
+  groupMessages.value.push(groupMessage);
+
+  scrollToBottom();
+
+});
+
+chatRoomClient.addEventListener("error", error => {
+
+  ElMessage({
+
+    message: `${t("content.chatRoom.chatError")} : ${error.type}`,
+    showClose: true,
+    type: "warning",
+    center: true
+
+  });
+
+});
+
+chatRoomClient.addEventListener("close", event => {
+
+  ElMessage({
+
+    message: t("content.chatRoom.exitRoom"),
+    showClose: true,
+    type: "success",
+    center: true
+
+  });
+
+  if (!event.wasClean) {
+
+    ElMessage({
+
+      message: t("content.chatRoom.chatError"),
+      showClose: true,
+      type: "warning",
+      center: true
+
+    });
+
+  }
+
+});
+
+onUnmounted(() => {
+
+  // 2024-8-23  21:49-页面关闭将关闭连接 , 以防止资源泄漏
+  chatRoomClient.close(1000, t("content.chatRoom.exitRoom"));
+
+});
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/23 PM 6:21:51
+ * @filename ChatRoom.vue
+ * @description 使群聊消息容器中的滑动容器滑动至底部
+ *
+ */
+function scrollToBottom() {
+
+  nextTick(() => {
+
+    // const scrollTop: number = chatMessageInnerRef.value.clientHeight - chatMessageRef.value.wrapRef.clientHeight;
+    chatMessageRef.value.setScrollTop(chatMessageInnerRef.value.clientHeight);
+
+  });
 
 }
 

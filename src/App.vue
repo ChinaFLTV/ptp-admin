@@ -12,6 +12,7 @@
 import {useRouter} from "vue-router";
 import {UserDataStore} from "@/store/modules/user";
 import LwFireworks from "lw_firewords";
+import {queryClientIp} from "@/api/system/status";
 
 const router = useRouter();
 const userDataStore = UserDataStore();
@@ -38,6 +39,9 @@ if (userDataStore.getUserData() !== null) {
   });
 
 }
+
+queryClientIp()
+
 
 </script>
 

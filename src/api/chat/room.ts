@@ -10,6 +10,7 @@
 import {PTP_USER_CHAT_BASE_URL} from "@/constants/web";
 import {service} from "@/config/axios/service";
 import {Result} from "@/model/po/response/Result";
+import {ChatRoom} from "@/model/po/ws/ChatRoom";
 
 /**
  *
@@ -84,7 +85,7 @@ export enum MessageType {
  * @description 查询指定房间号的群聊房间信息
  *
  */
-export const querySingleChatRoom = async (id: number): Promise<Result<Map<string, any>>> => {
+export const querySingleChatRoom = async (id: number): Promise<Result<ChatRoom>> => {
 
     return await service.get(`${PTP_USER_CHAT_BASE_URL}/query/population/${id}`);
 

@@ -7,10 +7,12 @@
  *
  */
 
+// 2024-8-25  21:08-本机的外网IP
+export let SERVER_IP: string = "192.168.124.9";
 // 2024-7-11  22:58-PTP在线站点的链接地址
-export const PTP_WEB_SITE_URL: string = "http://192.168.43.124:8150";
+export const PTP_WEB_SITE_URL: string = `http://${SERVER_IP}:8150`;
 // 2024-8-23  17:35-PTP在线站点的WebSocket链接地址
-export const PTP_WEB_SITE_WEBSOCKET_URL: string = "ws://192.168.43.124:8150";
+export const PTP_WEB_SITE_WEBSOCKET_URL: string = `ws://${SERVER_IP}:8150`;
 
 
 // 2024-8-1  21:15-PTP 网关微服务模块的上下文基地址
@@ -35,6 +37,8 @@ export const PTP_USER_ROLE_BASE_URL: string = "/content/user/role";
 export const PTP_USER_LOGIN_BASE_URL: string = "/gate";
 // 2024-8-23  17:09-user 群聊子模块的基地址
 export const PTP_USER_CHAT_BASE_URL: string = "/content/user/chat";
+// 2024-8-25  21:40-system 状态数据子模块的基地址
+export const PTP_SYSTEM_STATUS_BASE_URL: string = "/system/status";
 
 
 export const USER_LOGIN_COOKIE_KEY: string = "login_client_info"; // 2024-8-7  14:31-用户登录的环境信息Cookie对应的key

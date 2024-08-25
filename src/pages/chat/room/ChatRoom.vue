@@ -4,14 +4,18 @@
 
     <div class="message-container">
       <div class="message-top-bar-container">
-        <div class="room-name-container">{{ roomName ? roomName : $t("content.chatRoom.chatRoomName") }}</div>
+        <div class="room-name-container">{{
+            chatRoomInfo ? chatRoomInfo.name : $t("content.chatRoom.chatRoomName")
+          }}
+        </div>
       </div>
       <div class="message-content-container">
         <el-scrollbar ref="chatMessageRef">
           <div ref="chatMessageInnerRef">
             <div v-for="message in groupMessages" :key="message.id"
-                 :class="['group-message-info-container', message.senderId===userDataStore.localUserData.id?'reversed':'']">
-              <el-avatar :size="40" :src="message.senderAvatarUrl" :alt="message.senderNickname">
+                 :class="['group-message-info-container', message.senderId===userDataStore.localUserData?.id?'reversed':'']">
+              <el-avatar style="flex-shrink: 0;" :size="40" :src="message.senderAvatarUrl"
+                         :alt="message.senderNickname">
                 {{ message.senderNickname }}
               </el-avatar>
               <div class="group-message-content-container">
@@ -97,7 +101,7 @@
 
 import {Ref} from "vue";
 import {useI18n} from "@/hooks/web/useI18n";
-import {GroupMember, GroupMessage, MessageType} from "@/api/chat/room";
+import {GroupMember, GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
 import {EmotionHappy, FileAddition, PictureAlbum, Telegram} from "@icon-park/vue-next";
@@ -109,6 +113,7 @@ import {
   PTP_WEB_CONTEXT_URL,
   PTP_WEB_SITE_WEBSOCKET_URL
 } from "@/constants/web";
+import {ChatRoom} from "@/model/po/ws/ChatRoom";
 
 
 const chatMessageRef: Ref = ref(null);
@@ -120,18 +125,21 @@ const {t} = useI18n();
 const userDataStore = UserDataStore();
 
 
-// 2024-8-13  21:55-聊天室的房间名称
-const roomName: Ref<string> = ref(t("content.chatRoom.chatRoomName"));
 // 2024-8-14  22:44-聊天室在线用户信息列表
 const groupMembers: Ref<Array<GroupMember>> = ref([]);
 // 2024-8-16  21:02-群聊消息(包括部分历史消息)
 const groupMessages: Ref<GroupMessage[]> = ref([]);
 // 2024-8-20  23:25-用户待发送的消息内容
 const messageContent: Ref<string> = ref("");
+// 2024-8-24  09:47-聊天房间的信息
+const chatRoomInfo: Ref<ChatRoom> = ref();
 
 
 // 2024-8-23  20:44-用于与后端WebSocket服务器进行交互的WebSocket客户端
 const chatRoomClient: WebSocket = new WebSocket(`${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`);
+
+// 2024-8-24  09:57-获取一下最新的房间数据
+updateChatRoomInfo();
 
 /**
  *
@@ -277,6 +285,22 @@ function scrollToBottom() {
     chatMessageRef.value.setScrollTop(chatMessageInnerRef.value.clientHeight);
 
   });
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/24 AM 12:31:51
+ * @filename ChatRoom.vue
+ * @description 初始化房间信息UI
+ *
+ */
+async function updateChatRoomInfo() {
+
+  const res = await querySingleChatRoom(DEFAULT_CHAT_ROOM_ID);
+  chatRoomInfo.value = res["data"];
 
 }
 

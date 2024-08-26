@@ -127,8 +127,8 @@ $content_height: calc(100vh - 10px - $topBar_height - 10px - 10px);
 
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-image: url("/src/assets/image/login_background.webp");
   background-repeat: no-repeat;
   background-position: center;

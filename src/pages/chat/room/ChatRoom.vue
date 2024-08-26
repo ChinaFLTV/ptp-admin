@@ -67,7 +67,10 @@
           }}
         </div>
         <div style="margin: 0 5px;color: #E5EAF3;">·</div>
-        <div style="color: #E5EAF3;">1 / 155</div>
+        <div style="color: #E5EAF3;">{{ groupMembers?.length ? groupMembers.length : 0 }}</div>
+        <el-icon @click="updateContactList" :size="14" style="margin: auto 15px auto auto;color: #E5EAF3; ">
+          <RefreshLeft :class="{spinning:isSpinning}"/>
+        </el-icon>
       </div>
 
       <div class="contact-list-container">
@@ -76,8 +79,8 @@
 
           <div v-for="member in groupMembers" :key="member.id" class="group-member-info-container">
 
-            <online-dot style="margin-left: 10px" :online="member.isOnline">
-              <el-avatar :size="30" :src="member.avatarUrl" :alt="member.nickname">
+            <online-dot style="margin-left: 10px" :online="true">
+              <el-avatar :size="30" :src="JSON.parse(member?.avatar)?.uri" :alt="member.nickname">
                 {{ member.nickname }}
               </el-avatar>
             </online-dot>
@@ -114,11 +117,14 @@ import {
   PTP_WEB_SITE_WEBSOCKET_URL
 } from "@/constants/web";
 import {ChatRoom} from "@/model/po/ws/ChatRoom";
+import {queryUsersByIds} from "@/api/content/user";
+import {RefreshLeft} from "@element-plus/icons-vue";
 
 
 const chatMessageRef: Ref = ref(null);
 const chatMessageInnerRef: Ref = ref(null);
 const chatInputRef: Ref = ref(null);
+const isSpinning: Ref<boolean> = ref(false);
 
 
 const {t} = useI18n();
@@ -208,7 +214,7 @@ chatRoomClient.addEventListener("message", event => {
   const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
 
   // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
-  if (groupMessage.type == MessageType.SYSTEM) {
+  if (groupMessage.type >= 1703 && groupMessage.type <= 1706) {
 
     groupMessage.senderId = -1;
     groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
@@ -219,6 +225,13 @@ chatRoomClient.addEventListener("message", event => {
   groupMessages.value.push(groupMessage);
 
   scrollToBottom();
+
+  // 2024-8-26  14:39-如果本条消息是用户进入房间/退出房间的系统提示消息 , 则应该要启动一次刷新房间成员列表的任务
+  if (groupMessage.type === MessageType.SYSTEM_USER_ENTER || groupMessage.type === MessageType.SYSTEM_USER_EXIT) {
+
+    refreshContactList();
+
+  }
 
 });
 
@@ -261,13 +274,6 @@ chatRoomClient.addEventListener("close", event => {
 
 });
 
-onUnmounted(() => {
-
-  // 2024-8-23  21:49-页面关闭将关闭连接 , 以防止资源泄漏
-  chatRoomClient.close(1000, t("content.chatRoom.exitRoom"));
-
-});
-
 
 /**
  *
@@ -304,6 +310,79 @@ async function updateChatRoomInfo() {
 
 }
 
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/26 PM 2:40:58
+ * @filename ChatRoom.vue
+ * @description 刷新聊天房间的在线成员列表
+ *
+ */
+const refreshContactList = async () => {
+
+  if (chatRoomInfo?.value?.id) {
+
+    const newChatRoomInfo: ChatRoom = (await querySingleChatRoom(chatRoomInfo.value.id)).data;
+    chatRoomInfo.value = newChatRoomInfo;
+    if (newChatRoomInfo.onlineUsers || newChatRoomInfo.onlineUsers?.size > 0) {
+
+      groupMembers.value = (await queryUsersByIds(newChatRoomInfo?.onlineUsers)).data;
+
+    }
+
+  }
+
+};
+
+
+// 2024-8-20  15:11-后台每10s刷新一次在线成员列表(延迟6s之后开始定时执行)
+let refreshContactListInterval;
+setTimeout(() => {
+
+  refreshContactListInterval = setInterval(refreshContactList, 10000);
+
+}, 6000);
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/26 PM 6:42:21
+ * @filename ChatRoom.vue
+ * @description 手动更新当前聊天房间的最新的在线用户列表
+ *
+ */
+const updateContactList = async () => {
+
+  try {
+
+    isSpinning.value = true;
+    await refreshContactList();
+
+  } catch (err) {
+
+    console.error(err);
+
+  } finally {
+
+    isSpinning.value = false;
+
+  }
+
+};
+
+
+onUnmounted(() => {
+
+  // 2024-8-23  21:49-页面关闭将关闭连接 , 以防止资源泄漏
+  chatRoomClient.close(1000, t("content.chatRoom.exitRoom"));
+
+  // 2024-8-26  15:10-清除定时器 , 防止网络请求任务无线堆积
+  clearInterval(refreshContactListInterval);
+
+});
+
 </script>
 
 
@@ -315,11 +394,17 @@ async function updateChatRoomInfo() {
 $dark-background: #323644;
 $dark-primary-text: #E5EAF3;
 $dark-secondary-text: #a6a9ad;
+$chat-room-container-width: 58vw;
+$chat-room-container-height: 70vh;
+$message-top-bar-container-height: 5vh;
+$message-input-container-height: 16vh;
+$contact-container-width: 11vw;
 
 .chat-room-container {
 
-  width: 60%;
-  height: 700px;
+  width: $chat-room-container-width;
+  height: $chat-room-container-height;
+  max-height: $chat-room-container-height;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -342,7 +427,7 @@ $dark-secondary-text: #a6a9ad;
       justify-content: center;
       align-items: center;
       width: 100%;
-      height: 60px;
+      height: $message-top-bar-container-height;
       background-color: $dark-background;
       border-radius: $global-dialog-radius $global-dialog-radius 0 0;
       border-bottom: 1px solid #272A37;
@@ -361,8 +446,7 @@ $dark-secondary-text: #a6a9ad;
     .message-content-container {
 
       width: 100%;
-      height: 500px; // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
-      flex-grow: 1;
+      height: calc(#{$chat-room-container-height} - #{$message-top-bar-container-height} - #{$message-input-container-height}); // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
       background-color: $dark-background;
       padding: 20px 0;
 
@@ -479,7 +563,7 @@ $dark-secondary-text: #a6a9ad;
 
     .message-input-container {
 
-      height: 120px;
+      height: $message-input-container-height;
       width: 100%;
       padding: 15px;
       background-color: $dark-background;
@@ -543,13 +627,13 @@ $dark-secondary-text: #a6a9ad;
 
   .contact-container {
 
-    $top-bar-height: 60px;
+    $top-bar-height: 5vh;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 2;
+    width: $contact-container-width;
     height: 100%;
 
     .contact-top-bar-container {
@@ -563,14 +647,39 @@ $dark-secondary-text: #a6a9ad;
       border-radius: $global-dialog-radius $global-dialog-radius 0 0;
       border-bottom: 1px solid #272A37;
       background-color: $dark-background;
+      font-size: 0.8vw;
+
+      .spinning {
+
+        animation: spin 1s;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+
+      }
+
+      @keyframes spin {
+
+        from {
+
+          transform: rotate(0deg);
+
+        }
+
+        to {
+
+          transform: rotate(360deg);
+
+        }
+
+      }
 
     }
 
     .contact-list-container {
 
       width: 100%;
-      height: calc(720px - #{$top-bar-height});
-      flex-grow: 1;
+      height: calc(100% - #{$top-bar-height});
       border-radius: 0 0 $global-dialog-radius $global-dialog-radius;
       padding: 10px 10px;
       background-color: $dark-background;

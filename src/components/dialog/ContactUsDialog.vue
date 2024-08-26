@@ -9,7 +9,7 @@
     <div class="contact-us-dialog-content-container">
 
       <el-text type="primary">{{ $t("content.contactUs.dialog.content") }}</el-text>
-      <el-image style="width:300px" src="src/assets/image/qq_qrcode.jpg" alt="达哥QQ二维码"/>
+      <el-image style="width:80%;" src="src/assets/image/qq_qrcode.jpg" alt="达哥QQ二维码"/>
 
     </div>
 

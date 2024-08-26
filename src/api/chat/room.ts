@@ -69,8 +69,11 @@ export enum MessageType {
 
     GROUP_CHAT = 1701,
     PRIVATE_CHAT = 1702,
-    SYSTEM = 1703,
-    UNKNOWN = 1704
+    SYSTEM_USER_ENTER = 1703,
+    SYSTEM_USER_EXIT = 1704,
+    SYSTEM_ABNORMAL = 1705,
+    SYSTEM_RECOVER = 1706,
+    UNKNOWN = 1707
 
 
 }

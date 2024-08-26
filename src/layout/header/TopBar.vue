@@ -306,6 +306,7 @@ defineExpose({
       background-clip: text;
       cursor: default;
       user-select: none;
+      font-size: 0.5vw;
 
       & > * {
 

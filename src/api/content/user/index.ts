@@ -44,6 +44,25 @@ export const queryUserPage = async (offset: number, limit: number): Promise<Resu
 
 
 /**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/26 PM 2:37:53
+ * @filename index.ts
+ * @description 根据ID集合查询多条用户数据
+ * @param ids {Set<number>} 所要查询的用户ID集合
+ * @return {Promise<Result<User[]>>} 当前房间的在线用户列表
+ *
+ */
+export const queryUsersByIds = async (ids: Set<number>): Promise<Result<User[]>> => {
+
+    // 2024-8-26  16:35-由于Axios会自动预处理集合类型的参数(ids=xx1&ids=xx2&ids=xx3 => ids[]=xxx) , 所以我们需要自己手动拼接集合类型的Query参数
+    const queryString: string = [...ids].map(id => `ids=${id}`).join("&");
+    return await service.get(`${PTP_USER_BASE_URL}/query/byIds?${queryString}`);
+
+};
+
+
+/**
  * @author LiGuanda
  * @date 2024/8/7 AM 12:00:35
  * @filename index.ts

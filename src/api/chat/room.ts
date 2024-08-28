@@ -17,6 +17,7 @@ import {ChatRoom} from "@/model/po/ws/ChatRoom";
  * @author Lenovo/LiGuanda
  * @date 2024/8/14 PM 10:35:00
  * @filename room.ts
+ * @note 大多数情况下使用User数据实体即可
  * @description 群组中的群成员数据接口
  *
  */

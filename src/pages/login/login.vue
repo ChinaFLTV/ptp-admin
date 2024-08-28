@@ -230,8 +230,8 @@ function login() {
 
   > .formContainer {
 
-    width: 600px;
-    height: 400px;
+    width: 32vw;
+    height: 45vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -251,7 +251,7 @@ function login() {
 
     > .inputContainer {
 
-      width: 300px;
+      width: 60%;
       height: 40px;
       margin-bottom: 40px;
       box-sizing: border-box;
@@ -280,7 +280,7 @@ function login() {
 
     > .loginButton {
 
-      width: 150px;
+      width: 35%;
       height: 35px;
       color: #03e9f4;
       background: transparent;

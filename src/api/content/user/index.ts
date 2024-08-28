@@ -165,7 +165,7 @@ export const refreshGeolocation = async (userId: number, addressInfo: AddressInf
 export const changeAvatar = async (userId: number, picture: File): Promise<Result<string>> => {
 
     const formData: FormData = new FormData();
-    formData.set("userId", userId);
+    formData.set("userId", userId.toString());
     formData.set("picture", picture);
 
     return await service.post(`${PTP_USER_BASE_URL}/update/avatar`, formData, {

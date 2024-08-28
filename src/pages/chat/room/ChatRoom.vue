@@ -3,7 +3,7 @@
   <div class="chat-room-container">
 
     <div class="message-container">
-      <div class="message-top-bar-container">
+      <div ref="messageTopBarRef" class="message-top-bar-container">
         <div class="room-name-container">{{
             chatRoomInfo ? chatRoomInfo.name : $t("content.chatRoom.chatRoomName")
           }}
@@ -34,7 +34,15 @@
       </div>
       <div class="message-input-container">
         <div class="message-extension-container">
-          <emotion-happy theme="multi-color" size="20" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+          <el-popover trigger="click" :visible="isEmojiPanelVisible" placement="top" :width="0" :show-arrow="false"
+                      popper-class="message-extension-emoji-container"
+                      popper-style="background-color:transparent;border:none;box-shadow:unset;">
+            <EmojiPicker theme="dark" @select="onSelectEmoji" native/>
+            <template #reference>
+              <emotion-happy @click="isEmojiPanelVisible = true;" theme="multi-color" size="20"
+                             :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+            </template>
+          </el-popover>
           <picture-album theme="multi-color" style="margin-left: 10px;" size="20"
                          :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
           <file-addition theme="multi-color" style="margin-left: 10px;" size="20"
@@ -104,7 +112,7 @@
 
 import {Ref} from "vue";
 import {useI18n} from "@/hooks/web/useI18n";
-import {GroupMember, GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
+import {GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
 import {EmotionHappy, FileAddition, PictureAlbum, Telegram} from "@icon-park/vue-next";
@@ -119,12 +127,19 @@ import {
 import {ChatRoom} from "@/model/po/ws/ChatRoom";
 import {queryUsersByIds} from "@/api/content/user";
 import {RefreshLeft} from "@element-plus/icons-vue";
+import {User} from "@/model/po/manage/User";
+import EmojiPicker, {EmojiExt} from "vue3-emoji-picker";
+// 2024-8-28  21:55-必须要在这个位置处引入表情选择器开源库的CSS , 否则其组件的布局将会变得无限混乱
+import "vue3-emoji-picker/css";
 
-
+const messageTopBarRef: Ref = ref(null);
 const chatMessageRef: Ref = ref(null);
 const chatMessageInnerRef: Ref = ref(null);
 const chatInputRef: Ref = ref(null);
 const isSpinning: Ref<boolean> = ref(false);
+
+
+const isEmojiPanelVisible: Ref<boolean> = ref(false);
 
 
 const {t} = useI18n();
@@ -132,7 +147,7 @@ const userDataStore = UserDataStore();
 
 
 // 2024-8-14  22:44-聊天室在线用户信息列表
-const groupMembers: Ref<Array<GroupMember>> = ref([]);
+const groupMembers: Ref<Array<User>> = ref([]);
 // 2024-8-16  21:02-群聊消息(包括部分历史消息)
 const groupMessages: Ref<GroupMessage[]> = ref([]);
 // 2024-8-20  23:25-用户待发送的消息内容
@@ -308,6 +323,8 @@ async function updateChatRoomInfo() {
   const res = await querySingleChatRoom(DEFAULT_CHAT_ROOM_ID);
   chatRoomInfo.value = res["data"];
 
+  messageTopBarRef.value.style.backgroundImage = `url(${res["data"].avatarUrl})`;
+
 }
 
 
@@ -337,7 +354,7 @@ const refreshContactList = async () => {
 
 
 // 2024-8-20  15:11-后台每10s刷新一次在线成员列表(延迟6s之后开始定时执行)
-let refreshContactListInterval;
+let refreshContactListInterval: number;
 setTimeout(() => {
 
   refreshContactListInterval = setInterval(refreshContactList, 10000);
@@ -371,6 +388,33 @@ const updateContactList = async () => {
   }
 
 };
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/27 PM 9:39:42
+ * @filename ChatRoom.vue
+ * @param emoji {EmojiExt} 用户选择的表情
+ * @description 用户选择了某个表情之后的回调函数
+ *
+ */
+function onSelectEmoji(emoji: EmojiExt) {
+
+  const cursorOldIndex: number = chatInputRef?.value?.ref?.selectionStart;
+  messageContent.value = messageContent.value.slice(0, cursorOldIndex) + emoji.i + messageContent.value.slice(cursorOldIndex);
+
+  chatInputRef.value.focus();
+  isEmojiPanelVisible.value = false;
+
+  nextTick(() => {
+
+    const cursorNewIndex: number = cursorOldIndex + emoji.i.length;
+    chatInputRef.value.ref.setSelectionRange(cursorNewIndex, cursorNewIndex);
+
+  });
+
+}
 
 
 onUnmounted(() => {
@@ -431,6 +475,9 @@ $contact-container-width: 11vw;
       background-color: $dark-background;
       border-radius: $global-dialog-radius $global-dialog-radius 0 0;
       border-bottom: 1px solid #272A37;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
 
       .room-name-container {
 
@@ -579,6 +626,12 @@ $contact-container-width: 11vw;
         flex-direction: row;
         justify-content: start;
         align-items: center;
+
+        .message-extension-emoji-container {
+
+          padding: 0 !important;
+
+        }
 
       }
 

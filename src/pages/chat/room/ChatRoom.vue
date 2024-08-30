@@ -39,7 +39,7 @@
                       popper-style="background-color:transparent;border:none;box-shadow:unset;">
             <EmojiPicker theme="dark" @select="onSelectEmoji" native/>
             <template #reference>
-              <emotion-happy @click="isEmojiPanelVisible = true;" theme="multi-color" size="20"
+              <emotion-happy @click="isEmojiPanelVisible = !isEmojiPanelVisible;" theme="multi-color" size="20"
                              :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
             </template>
           </el-popover>
@@ -47,6 +47,8 @@
                          :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
           <file-addition theme="multi-color" style="margin-left: 10px;" size="20"
                          :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+          <voice theme="multi-color" style="margin-left: 10px;" size="20"
+                 :fill="['#FFF' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
         </div>
         <div class="message-input-bottom-half-container">
           <el-input
@@ -115,7 +117,7 @@ import {useI18n} from "@/hooks/web/useI18n";
 import {GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
-import {EmotionHappy, FileAddition, PictureAlbum, Telegram} from "@icon-park/vue-next";
+import {EmotionHappy, FileAddition, PictureAlbum, Telegram, Voice} from "@icon-park/vue-next";
 import {ElMessage} from "element-plus";
 import randomUUID from "@/utils/uuid";
 import {
@@ -229,7 +231,7 @@ chatRoomClient.addEventListener("message", event => {
   const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
 
   // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
-  if (groupMessage.type >= 1703 && groupMessage.type <= 1706) {
+  if (groupMessage.messageType >= 1703 && groupMessage.messageType <= 1706) {
 
     groupMessage.senderId = -1;
     groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
@@ -242,7 +244,7 @@ chatRoomClient.addEventListener("message", event => {
   scrollToBottom();
 
   // 2024-8-26  14:39-如果本条消息是用户进入房间/退出房间的系统提示消息 , 则应该要启动一次刷新房间成员列表的任务
-  if (groupMessage.type === MessageType.SYSTEM_USER_ENTER || groupMessage.type === MessageType.SYSTEM_USER_EXIT) {
+  if (groupMessage.messageType === MessageType.SYSTEM_USER_ENTER || groupMessage.messageType === MessageType.SYSTEM_USER_EXIT) {
 
     refreshContactList();
 

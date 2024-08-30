@@ -24,6 +24,8 @@ export default {
 
                 appTitle: "PTP Background Management Platform",
                 chatRoom: "Chat Room",
+                myBlog: "My Blog",
+                entertainment: "Entertainment",
                 contactUs: "Contact Us",
                 enterFullscreen: "Enter Fullscreen",
                 exitFullscreen: "Exit Fullscreen",

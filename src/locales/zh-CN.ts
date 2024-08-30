@@ -26,6 +26,8 @@ export default {
 
                 appTitle: "PTP后台管理平台",
                 chatRoom: "聊天室",
+                myBlog: "我的博客",
+                entertainment: "娱乐",
                 contactUs: "与我们联系",
                 enterFullscreen: "全屏",
                 exitFullscreen: "退出全屏",

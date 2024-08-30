@@ -20,6 +20,16 @@
               :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
       <span class="top-bar-item-text-container">{{ $t("common.bar.top.chatRoom") }}</span>
     </span>
+    <span class="top-bar-item-container" @click="jumpBrowserPage">
+      <book-one class="top-bar-item-icon-container" theme="multi-color" size="20"
+                :fill="['#000' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+      <span class="top-bar-item-text-container">{{ $t("common.bar.top.myBlog") }}</span>
+    </span>
+    <span class="top-bar-item-container" @click="jumpGamePage">
+      <game-three class="top-bar-item-icon-container" theme="multi-color" size="20"
+                  :fill="['#000' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+      <span class="top-bar-item-text-container">{{ $t("common.bar.top.entertainment") }}</span>
+    </span>
 
     <div class="flex-grow-spacer"/>
 
@@ -98,7 +108,7 @@ import WaveView from "@/components/animation/WaveView.vue";
 import {PTP_WEB_SITE_URL} from "@/constants/web";
 import {LoginClientType} from "@/enums/LoginClientType";
 import {logout} from "@/api/content/user/login";
-import {Wechat} from "@icon-park/vue-next";
+import {BookOne, GameThree, Wechat} from "@icon-park/vue-next";
 
 const welcomeUserNameRef = ref(null);
 const avatarRef = ref(null);
@@ -131,6 +141,53 @@ function jumpChatRoomPage() {
   router.push({
 
     name: "chat-room"
+
+  });
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/29 PM 8:55:49
+ * @filename TopBar.vue
+ * @description 跳转至浏览器页面
+ *
+ */
+function jumpBrowserPage() {
+
+  router.push({
+
+    name: "browse",
+    state: {
+
+      params: {
+
+        url: "https://www.yuque.com/jujingyi-mzjzr"
+
+      }
+
+    }
+
+  });
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/30 PM 10:10:06
+ * @filename TopBar.vue
+ * @description 跳转到游戏界面
+ *
+ */
+function jumpGamePage() {
+
+  router.push({
+
+    name: "entertainment"
 
   });
 

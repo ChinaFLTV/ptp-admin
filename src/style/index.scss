@@ -8,3 +8,6 @@
 
 // 2024-8-28  20:57-引入表情选择器的样式
 // @import '../../node_modules/vue3-emoji-picker/dist/style.css';
+
+// 2024-8-31  14:21-引入normalize.css样式来重置不必要的元素的默认样式 , 保留具有价值的默认样式 , 同时还能确保不同浏览器的样式一致性
+@import 'normalize.css/normalize.css';

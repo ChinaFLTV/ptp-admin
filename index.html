@@ -1,40 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
+
+    <!--  2024-8-31  9:40-配置网页的编码信息  -->
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
+    <!--  2024-8-31  9:41-针对于IE浏览器的兼容性配置  -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--  2024-8-31  9:41-针对于移动端的配置  -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--  2024-8-31  9:42-配置网页关键字(便于SEO)(content为8~12个以英文逗号相隔的关键词)  -->
+    <meta name="keywords" content="PTP,ProgrammingThePast,编程旧事,编程,代码,博客,技术论坛,Java,后端,前端,全栈开发">
+    <!--  2024-8-31  9:45-配置网页描述信息(80字以内)  -->
+    <meta name="description"
+          content="PTP是一款通过构建技术与资源交流平台，进而促进编程技术繁荣的一款软件，同时它具有聚合编程文章搜索的功能，能够提供丰富的编程文章资源供用户使用。">
+    <!--  2024-8-31  9:46-针对于搜索引擎爬虫的配置  -->
+    <!--  index : 允许搜索引擎索引此界面  -->
+    <!--  follow : 允许搜索引擎跟随此页面上的链接  -->
+    <meta name="robots" content="index,follow">
+    <!--  2024-8-31  9:47-配置网页作者  -->
+    <meta name="author" content="Dage">
+    <!--  2024-8-31  9:48-配置网页生成工具  -->
+    <meta name="generator" content="Jetbrains Webstorm 2024.1.5">
+    <!--  2024-8-31  9:49-配置网页的版权信息  -->
+    <meta name="copyright" content="2021-2025@版权所有">
+    <!--  2024-8-31  9:50-配置网页自动刷新  -->
+    <meta name="refresh" content="10;http://www.ptp.ink">
+    <!--  2024-8-31  9:53-首屏加载优化 : 优化HTML代码 : CSS外链放在顶部  -->
+    <link rel="icon" href="/favicon.ico">
     <title>PTP后台管理中心</title>
+    <style>
+
+        // 2024-8-31  14:18-下面的选择器需要将全部标签元素重置一遍 , 这种做法过于简单粗暴 , 这样会使得网页加载缓慢 , 因此不建议这样使用 , 建议引入normalize.css来处理默认样式的问题
+        /* * {
+
+            margin: 0;
+            padding: 0;
+
+        }*/
+
+        html {
+
+            width: 100%;
+            height: 100%;
+
+        }
+
+        body {
+
+            width: 100%;
+            height: 100%;
+            // 2024-8-31  12:54-不同浏览器上的默认字体大小可能不同 , 因此需要提前给一个统一的默认字体大小
+            font-size: 16px;
+
+        }
+
+    </style>
+
 </head>
+
 <!--  2024-7-11  23:09-禁止鼠标右击后弹出浏览器菜单(解决方案 : https://juejin.cn/post/6956215019176460319)  -->
 <body oncontextmenu="return false">
-
 <div id="main-area"></div>
+</body>
+
+<!--  2024-8-31  9:54-首屏加载优化 : 优化HTML代码 : JS外链放在底部  -->
 <script type="module" src="/src/main.ts"></script>
 
-</body>
-<style>
-
-    * {
-
-        margin: 0;
-        padding: 0;
-
-    }
-
-    html{
-
-        width: 100%;
-        height: 100%;
-
-    }
-
-    body{
-
-        width: 100%;
-        height: 100%;
-
-    }
-
-</style>
 </html>

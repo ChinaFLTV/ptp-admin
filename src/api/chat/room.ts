@@ -52,7 +52,7 @@ export interface GroupMessage {
     senderAvatarUrl?: string; // 2024-8-15  22:37-发送者头像URL
     receiverId?: number; // 2024-8-15  22:38-接受者ID(-1则为全部聊天成员接收)
     dateTime: Date; // 2024-8-15  22:39-消息发送时间
-    dataUri: string; // 2024-8-30  23:10-如果内容类型是多媒体(非纯文本)数据类型 , 则该字段存储对应数据的直链
+    dataUri?: string; // 2024-8-30  23:10-如果内容类型是多媒体(非纯文本)数据类型 , 则该字段存储对应数据的直链
     contentType: ContentType; // 2024-8-30  22:48-消息内容类型
     messageType: MessageType; // 2024-8-15  22:39-消息类型
 

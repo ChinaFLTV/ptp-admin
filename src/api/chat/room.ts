@@ -97,3 +97,46 @@ export const querySingleChatRoom = async (id: number): Promise<Result<ChatRoom>>
     return await service.get(`${PTP_USER_CHAT_BASE_URL}/query/population/${id}`);
 
 };
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/3 PM 10:12:05
+ * @filename room.ts
+ * @param userId {number}当前的用户ID
+ * @param messageId {number} 消息ID
+ * @param contentType {ContentType}消息内容类型
+ * @param mediaFile {File} 多媒体文件
+ * @returns {Result<string>} 上传成功则返回该资源的云端访问直链 , 失败则返回null
+ * @description 上传聊天消息中引用到的媒体数据
+ *
+ */
+export const uploadMediaFile = async (
+    userId: number,
+    messageId: number,
+    contentType: ContentType,
+    mediaFile: File
+): Promise<Result<string>> => {
+
+    const formData: FormData = new FormData();
+    formData.append("userId", userId.toString());
+    formData.append("messageId", messageId.toString());
+    formData.append("contentType", contentType.toString());
+    formData.append("mediaFile", mediaFile);
+
+    return await service.post(
+        `${PTP_USER_CHAT_BASE_URL}/upload/media`,
+        formData,
+        {
+
+            headers: {
+
+                "Content-Type": "multipart/form-data"
+
+            }
+
+        }
+    );
+
+};

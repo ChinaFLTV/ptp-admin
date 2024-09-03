@@ -5,8 +5,8 @@
         <div class="room-name-container">
           {{
             chatRoomInfo
-              ? chatRoomInfo.name
-              : $t("content.chatRoom.chatRoomName")
+                ? chatRoomInfo.name
+                : $t("content.chatRoom.chatRoomName")
           }}
         </div>
       </div>
@@ -14,9 +14,9 @@
         <el-scrollbar ref="chatMessageRef">
           <div ref="chatMessageInnerRef">
             <div
-              v-for="message in groupMessages"
-              :key="message.id"
-              :class="[
+                v-for="message in groupMessages"
+                :key="message.id"
+                :class="[
                 'group-message-info-container',
                 message.senderId === userDataStore.localUserData?.id
                   ? 'reversed'
@@ -24,24 +24,24 @@
               ]"
             >
               <el-avatar
-                style="flex-shrink: 0"
-                :size="40"
-                :src="message.senderAvatarUrl"
-                :alt="message.senderNickname"
+                  style="flex-shrink: 0"
+                  :size="40"
+                  :src="message.senderAvatarUrl"
+                  :alt="message.senderNickname"
               >
                 {{ message.senderNickname }}
               </el-avatar>
               <div class="group-message-content-container">
                 <div class="group-message-nickname-info-container">
                   <span style="color: #a6a9ad">{{
-                    message.senderNickname
-                  }}</span>
+                      message.senderNickname
+                    }}</span>
                   <span class="group-message-senderId-info-container"
-                    >({{ message.senderId }})</span
+                  >({{ message.senderId }})</span
                   >
                   <span class="group-message-datetime-info-container">{{
-                    dayjs(message.dateTime).format("MM/DD HH:mm:ss")
-                  }}</span>
+                      dayjs(message.dateTime).format("MM/DD HH:mm:ss")
+                    }}</span>
                 </div>
                 <div class="group-message-content-info-container">
                   {{ message.content }}
@@ -54,63 +54,63 @@
       <div class="message-input-container">
         <div class="message-extension-container">
           <el-popover
-            trigger="click"
-            :visible="isEmojiPanelVisible"
-            placement="top"
-            :width="0"
-            :show-arrow="false"
-            popper-class="message-extension-emoji-container"
-            popper-style="background-color:transparent;border:none;box-shadow:unset;"
+              trigger="click"
+              :visible="isEmojiPanelVisible"
+              placement="top"
+              :width="0"
+              :show-arrow="false"
+              popper-class="message-extension-emoji-container"
+              popper-style="background-color:transparent;border:none;box-shadow:unset;"
           >
-            <EmojiPicker theme="dark" @select="onSelectEmoji" native />
+            <EmojiPicker theme="dark" @select="onSelectEmoji" native/>
             <template #reference>
               <emotion-happy
-                @click="isEmojiPanelVisible = !isEmojiPanelVisible"
-                theme="multi-color"
-                size="20"
-                :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+                  @click="isEmojiPanelVisible = !isEmojiPanelVisible"
+                  theme="multi-color"
+                  size="20"
+                  :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
               />
             </template>
           </el-popover>
           <picture-album
-            theme="multi-color"
-            style="margin-left: 10px"
-            size="20"
-            :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+              theme="multi-color"
+              style="margin-left: 10px"
+              size="20"
+              :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
           />
           <file-addition
-            theme="multi-color"
-            style="margin-left: 10px"
-            size="20"
-            :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+              theme="multi-color"
+              style="margin-left: 10px"
+              size="20"
+              :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
           />
           <voice
-            theme="multi-color"
-            style="margin-left: 10px"
-            size="20"
-            :fill="['#FFF', '#2F88FF', '#FFF', '#43CCF8']"
+              theme="multi-color"
+              style="margin-left: 10px"
+              size="20"
+              :fill="['#FFF', '#2F88FF', '#FFF', '#43CCF8']"
           />
         </div>
         <div class="message-input-bottom-half-container">
           <el-input
-            ref="chatInputRef"
-            style="border: none"
-            class="message-input-component"
-            v-model="messageContent"
-            type="textarea"
-            rows="3"
-            resize="none"
-            :placeholder="t('content.chatRoom.chatInputPlaceholder')"
-            maxlength="500"
-            @keyup.enter="sendMessage"
-            show-word-limit
+              ref="chatInputRef"
+              style="border: none"
+              class="message-input-component"
+              v-model="messageContent"
+              type="textarea"
+              rows="3"
+              resize="none"
+              :placeholder="t('content.chatRoom.chatInputPlaceholder')"
+              maxlength="500"
+              @keyup.enter="sendMessage"
+              show-word-limit
           />
           <Telegram
-            @click="sendMessage"
-            class="send-message-icon"
-            theme="filled"
-            size="20"
-            fill="#a6a9ad"
+              @click="sendMessage"
+              class="send-message-icon"
+              theme="filled"
+              size="20"
+              fill="#a6a9ad"
           />
         </div>
       </div>
@@ -124,38 +124,38 @@
         <div style="margin: 0 5px; color: #e5eaf3">·</div>
         <!-- <div style="color: #E5EAF3;">{{ groupMembers?.length ? groupMembers.length : 0 }}</div> -->
         <count-up style="color: #E5EAF3;"
-          :start-val="0"
-          :end-val="groupMembers.length"
-          :duration="1.5"
+                  :start-val="0"
+                  :end-val="groupMembers.length"
+                  :duration="1.5"
         ></count-up>
         <el-icon
-          @click="updateContactList"
-          :size="14"
-          style="margin: auto 15px auto auto; color: #e5eaf3"
+            @click="updateContactList"
+            :size="14"
+            style="margin: auto 15px auto auto; color: #e5eaf3"
         >
-          <RefreshLeft :class="{ spinning: isSpinning }" />
+          <RefreshLeft :class="{ spinning: isSpinning }"/>
         </el-icon>
       </div>
 
       <div class="contact-list-container">
         <el-scrollbar height="800px">
           <div
-            v-for="member in groupMembers"
-            :key="member.id"
-            class="group-member-info-container"
+              v-for="member in groupMembers"
+              :key="member.id"
+              class="group-member-info-container"
           >
             <online-dot style="margin-left: 10px" :online="true">
               <el-avatar
-                :size="30"
-                :src="JSON.parse(member?.avatar)?.uri"
-                :alt="member.nickname"
+                  :size="30"
+                  :src="JSON.parse(member?.avatar)?.uri"
+                  :alt="member.nickname"
               >
                 {{ member.nickname }}
               </el-avatar>
             </online-dot>
             <span class="group-member-info-nickname-container">{{
-              member.nickname
-            }}</span>
+                member.nickname
+              }}</span>
           </div>
         </el-scrollbar>
       </div>
@@ -164,39 +164,28 @@
 </template>
 
 <script setup lang="ts">
-import { Ref } from "vue";
-import { useI18n } from "@/hooks/web/useI18n";
-import {
-  GroupMessage,
-  MessageType,
-  querySingleChatRoom,
-} from "@/api/chat/room";
-import { UserDataStore } from "@/store/modules/user";
+import {Ref} from "vue";
+import {useI18n} from "@/hooks/web/useI18n";
+import {GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
+import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
-import {
-  EmotionHappy,
-  FileAddition,
-  PictureAlbum,
-  Telegram,
-  Voice,
-} from "@icon-park/vue-next";
-import { ElMessage } from "element-plus";
+import {EmotionHappy, FileAddition, PictureAlbum, Telegram, Voice} from "@icon-park/vue-next";
+import {ElMessage} from "element-plus";
 import randomUUID from "@/utils/uuid";
 import {
   DEFAULT_CHAT_ROOM_ID,
   PTP_USER_CHAT_BASE_URL,
   PTP_WEB_CONTEXT_URL,
-  PTP_WEB_SITE_WEBSOCKET_URL,
+  PTP_WEB_SITE_WEBSOCKET_URL
 } from "@/constants/web";
-import { ChatRoom } from "@/model/po/ws/ChatRoom";
-import { queryUsersByIds } from "@/api/content/user";
-import { RefreshLeft } from "@element-plus/icons-vue";
-import { User } from "@/model/po/manage/User";
-import EmojiPicker, { EmojiExt } from "vue3-emoji-picker";
+import {ChatRoom} from "@/model/po/ws/ChatRoom";
+import {queryUsersByIds} from "@/api/content/user";
+import {RefreshLeft} from "@element-plus/icons-vue";
+import {User} from "@/model/po/manage/User";
+import EmojiPicker, {EmojiExt} from "vue3-emoji-picker";
 // 2024-8-28  21:55-必须要在这个位置处引入表情选择器开源库的CSS , 否则其组件的布局将会变得无限混乱
 import "vue3-emoji-picker/css";
-import { useTransition } from "@vueuse/core";
-import { ContentType } from "@/model/po/ws/ContentType";
+import {ContentType} from "@/model/po/ws/ContentType";
 import CountUp from "vue-countup-v3";
 
 const messageTopBarRef: Ref = ref(null);
@@ -207,7 +196,7 @@ const isSpinning: Ref<boolean> = ref(false);
 
 const isEmojiPanelVisible: Ref<boolean> = ref(false);
 
-const { t } = useI18n();
+const {t} = useI18n();
 const userDataStore = UserDataStore();
 
 // 2024-8-14  22:44-聊天室在线用户信息列表
@@ -218,14 +207,10 @@ const groupMessages: Ref<GroupMessage[]> = ref([]);
 const messageContent: Ref<string> = ref("");
 // 2024-8-24  09:47-聊天房间的信息
 const chatRoomInfo: Ref<ChatRoom> = ref();
-// 2024-8-31  22:50-用于设置动态变化的聊天室在线人数数字动效
-const dynamicOnlineUsersNum = useTransition(groupMembers.value.length, {
-  duration: 1500,
-});
 
 // 2024-8-23  20:44-用于与后端WebSocket服务器进行交互的WebSocket客户端
 const chatRoomClient: WebSocket = new WebSocket(
-  `${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`
+    `${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`
 );
 
 // 2024-8-24  09:57-获取一下最新的房间数据
@@ -245,7 +230,7 @@ async function sendMessage() {
       message: t("content.chatRoom.messageContentIsEmpty"),
       showClose: true,
       type: "warning",
-      center: true,
+      center: true
     });
 
     // 2024-8-23  23:38-避免在持续回车的情况下发送消息导致消息发送失败而消息输入框中的内容出现多行文字的情况
@@ -263,7 +248,7 @@ async function sendMessage() {
     receiverId: -1,
     dateTime: new Date(),
     contentType: ContentType.TEXT,
-    messageType: MessageType.GROUP_CHAT,
+    messageType: MessageType.GROUP_CHAT
   };
 
   chatRoomClient.send(JSON.stringify(newMessage));
@@ -276,7 +261,7 @@ chatRoomClient.addEventListener("open", () => {
     message: t("content.chatRoom.enterRoom"),
     showClose: true,
     type: "success",
-    center: true,
+    center: true
   });
 });
 
@@ -297,8 +282,8 @@ chatRoomClient.addEventListener("message", (event) => {
 
   // 2024-8-26  14:39-如果本条消息是用户进入房间/退出房间的系统提示消息 , 则应该要启动一次刷新房间成员列表的任务
   if (
-    groupMessage.messageType === MessageType.SYSTEM_USER_ENTER ||
-    groupMessage.messageType === MessageType.SYSTEM_USER_EXIT
+      groupMessage.messageType === MessageType.SYSTEM_USER_ENTER ||
+      groupMessage.messageType === MessageType.SYSTEM_USER_EXIT
   ) {
     refreshContactList();
   }
@@ -309,7 +294,7 @@ chatRoomClient.addEventListener("error", (error) => {
     message: `${t("content.chatRoom.chatError")} : ${error.type}`,
     showClose: true,
     type: "warning",
-    center: true,
+    center: true
   });
 });
 
@@ -318,7 +303,7 @@ chatRoomClient.addEventListener("close", (event) => {
     message: t("content.chatRoom.exitRoom"),
     showClose: true,
     type: "success",
-    center: true,
+    center: true
   });
 
   if (!event.wasClean) {
@@ -326,7 +311,7 @@ chatRoomClient.addEventListener("close", (event) => {
       message: t("content.chatRoom.chatError"),
       showClose: true,
       type: "warning",
-      center: true,
+      center: true
     });
   }
 });
@@ -372,12 +357,12 @@ async function updateChatRoomInfo() {
 const refreshContactList = async () => {
   if (chatRoomInfo?.value?.id) {
     const newChatRoomInfo: ChatRoom = (
-      await querySingleChatRoom(chatRoomInfo.value.id)
+        await querySingleChatRoom(chatRoomInfo.value.id)
     ).data;
     chatRoomInfo.value = newChatRoomInfo;
     if (newChatRoomInfo.onlineUsers || newChatRoomInfo.onlineUsers?.size > 0) {
       groupMembers.value = (
-        await queryUsersByIds(newChatRoomInfo?.onlineUsers)
+          await queryUsersByIds(newChatRoomInfo?.onlineUsers)
       ).data;
     }
   }
@@ -420,9 +405,9 @@ const updateContactList = async () => {
 function onSelectEmoji(emoji: EmojiExt) {
   const cursorOldIndex: number = chatInputRef?.value?.ref?.selectionStart;
   messageContent.value =
-    messageContent.value.slice(0, cursorOldIndex) +
-    emoji.i +
-    messageContent.value.slice(cursorOldIndex);
+      messageContent.value.slice(0, cursorOldIndex) +
+      emoji.i +
+      messageContent.value.slice(cursorOldIndex);
 
   chatInputRef.value.focus();
   isEmojiPanelVisible.value = false;
@@ -498,7 +483,7 @@ $contact-container-width: 11vw;
     .message-content-container {
       width: 100%;
       height: calc(
-        #{$chat-room-container-height} - #{$message-top-bar-container-height} -
+          #{$chat-room-container-height} - #{$message-top-bar-container-height} -
           #{$message-input-container-height}
       ); // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
       background-color: $dark-background;

@@ -20,7 +20,6 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
-    ElStatistic: typeof import('element-plus/es')['ElStatistic']
     ElText: typeof import('element-plus/es')['ElText']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     OnlineDot: typeof import('./src/components/user/OnlineDot.vue')['default']

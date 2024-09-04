@@ -12,6 +12,7 @@ import {setupCustomDirectives} from "@/directives";
 import {setupRouter} from "@/router";
 import {setupElementPlus} from "@/plugins/elementPlus";
 import {install} from "@icon-park/vue-next/es/all";
+import {ElMessage} from "element-plus";
 
 /**
  *
@@ -47,6 +48,23 @@ function configPlugins(app: VueApp<Element>) {
 
     // 2024-8-11  15:21-全局安装IconPark图标
     install(app);
+
+    // 2024-9-4  21:33-开发环境建议取消注册该钩子函数以尽可能的尽早暴露出错误来以进行错误处理
+    // 2024-9-4  21:02-设置全局异常捕获钩子 , 该钩子将在组件渲染&观察期间出现错误但未能捕获时被调用(该钩子函数同样能捕获函数返回的Promise内部抛出的错误)
+    // v2.2.0+ 该钩子可以捕获Vue生命周期钩子中抛出的错误
+    // v2.4.0+ 该钩子可以捕获Vue自定义事件处理函数中抛出的错误
+    // v2.6.0+ 该钩子可以捕获Vue的v-on DOM监听器内部抛出的错误
+    app.config.errorHandler = function (error: Error) {
+
+        console.error("发生错误 : ", error);
+        ElMessage({
+            message: `错误 : ${error.message}`,
+            showClose: true,
+            type: "error",
+            center: true
+        });
+
+    };
 
     app.mount("#main-area");
 

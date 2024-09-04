@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="message-content-container">
-        <el-scrollbar ref="chatMessageRef">
+        <el-scrollbar id="messageContentContainer" ref="chatMessageRef">
           <div ref="chatMessageInnerRef">
             <div
                 v-for="message in groupMessages"
@@ -43,8 +43,20 @@
                       dayjs(message.dateTime).format("MM/DD HH:mm:ss")
                     }}</span>
                 </div>
-                <div class="group-message-content-info-container">
+                <div v-if="message.contentType==ContentType.TEXT" class="group-message-content-info-container">
                   {{ message.content }}
+                </div>
+                <div v-else-if="message.contentType==ContentType.PHOTO" class="group-message-content-info-container"
+                     style="padding: 0;width: 100px;height: 100px;">
+                  <el-image style="width: 100px; height: 100px;" :src="message.dataUri" :fit="'cover'"
+                            :preview-src-list="[message.dataUri]" scroll-container="#messageContentContainer" lazy>
+                    <template #error>
+                      <div style="width:100%;height:100%;display: flex;justify-content: center;align-items: center;">
+                        <error-picture style="padding: 0;margin: 0;" theme="multi-color" size="20"
+                                       :fill="['#000' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+                      </div>
+                    </template>
+                  </el-image>
                 </div>
               </div>
             </div>
@@ -73,11 +85,17 @@
             </template>
           </el-popover>
           <picture-album
+              v-if="contentType==ContentType.TEXT"
               theme="multi-color"
               style="margin-left: 10px"
               size="20"
               :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+              @click.prevent="photoSelectRef.click()"
           />
+          <error-picture v-if="contentType==ContentType.PHOTO" theme="multi-color" size="20" style="margin-left: 10px"
+                         :fill="['#000' ,'#d0021b' ,'#ffffff' ,'#43CCF8']" @click="cancelSendMediaFile"/>
+          <input style="display: none;" type="file" accept="image/*" id="picture-input" ref="photoSelectRef"
+                 @change="handleMediaFileChange">
           <file-addition
               theme="multi-color"
               style="margin-left: 10px"
@@ -103,6 +121,7 @@
               :placeholder="t('content.chatRoom.chatInputPlaceholder')"
               maxlength="500"
               @keyup.enter="sendMessage"
+              :disabled="isChatInputDisabled"
               show-word-limit
           />
           <Telegram
@@ -166,12 +185,11 @@
 <script setup lang="ts">
 import {Ref} from "vue";
 import {useI18n} from "@/hooks/web/useI18n";
-import {GroupMessage, MessageType, querySingleChatRoom} from "@/api/chat/room";
+import {GroupMessage, MessageType, querySingleChatRoom, uploadMediaFile} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
-import {EmotionHappy, FileAddition, PictureAlbum, Telegram, Voice} from "@icon-park/vue-next";
+import {EmotionHappy, ErrorPicture, FileAddition, PictureAlbum, Telegram, Voice} from "@icon-park/vue-next";
 import {ElMessage} from "element-plus";
-import randomUUID from "@/utils/uuid";
 import {
   DEFAULT_CHAT_ROOM_ID,
   PTP_USER_CHAT_BASE_URL,
@@ -187,14 +205,18 @@ import EmojiPicker, {EmojiExt} from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import {ContentType} from "@/model/po/ws/ContentType";
 import CountUp from "vue-countup-v3";
+import randomUUID from "@/utils/uuid";
+
 
 const messageTopBarRef: Ref = ref(null);
 const chatMessageRef: Ref = ref(null);
+const photoSelectRef: Ref = ref(null);
 const chatMessageInnerRef: Ref = ref(null);
 const chatInputRef: Ref = ref(null);
 const isSpinning: Ref<boolean> = ref(false);
 
 const isEmojiPanelVisible: Ref<boolean> = ref(false);
+const isChatInputDisabled: Ref<boolean> = ref(false);
 
 const {t} = useI18n();
 const userDataStore = UserDataStore();
@@ -202,78 +224,60 @@ const userDataStore = UserDataStore();
 // 2024-8-14  22:44-聊天室在线用户信息列表
 const groupMembers: Ref<Array<User>> = ref([]);
 // 2024-8-16  21:02-群聊消息(包括部分历史消息)
-const groupMessages: Ref<GroupMessage[]> = ref([]);
+const groupMessages: Ref<GroupMessage[]> = ref([{
+  id: 520,
+  senderId: 9,
+  senderNickname: "鞠婧祎",
+  senderAvatarUrl: "http://loveyou",
+  dataUri: JSON.parse(userDataStore.localUserData.avatar).uri,
+  contentType: ContentType.PHOTO,
+  messageType: MessageType.GROUP_CHAT
+
+} as GroupMessage]);
 // 2024-8-20  23:25-用户待发送的消息内容
 const messageContent: Ref<string> = ref("");
 // 2024-8-24  09:47-聊天房间的信息
 const chatRoomInfo: Ref<ChatRoom> = ref();
 
 // 2024-8-23  20:44-用于与后端WebSocket服务器进行交互的WebSocket客户端
-const chatRoomClient: WebSocket = new WebSocket(
-    `${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`
-);
+const chatRoomClient: WebSocket = new WebSocket(`${PTP_WEB_SITE_WEBSOCKET_URL}${PTP_WEB_CONTEXT_URL}${PTP_USER_CHAT_BASE_URL}/room?roomId=${DEFAULT_CHAT_ROOM_ID}&userId=${userDataStore.localUserData.id}`);
+// 2024-9-4  22:04-用户将要发送的多媒体文件(包括图片)
+const waitingSendMediaFile: Ref<File> = ref();
+// 2024-9-4  22:42-当前发送消息的内容类型
+const contentType: Ref<ContentType> = ref(ContentType.TEXT);
+
 
 // 2024-8-24  09:57-获取一下最新的房间数据
 updateChatRoomInfo();
 
-/**
- *
- * @author Lenovo/LiGuanda
- * @date 2024/8/21 PM 11:56:13
- * @filename ChatRoom.vue
- * @description 发送群聊消息
- *
- */
-async function sendMessage() {
-  if (messageContent.value.trim() == "") {
-    ElMessage({
-      message: t("content.chatRoom.messageContentIsEmpty"),
-      showClose: true,
-      type: "warning",
-      center: true
-    });
-
-    // 2024-8-23  23:38-避免在持续回车的情况下发送消息导致消息发送失败而消息输入框中的内容出现多行文字的情况
-    messageContent.value = "";
-
-    return;
-  }
-
-  const newMessage: GroupMessage = {
-    id: randomUUID(),
-    content: messageContent.value,
-    senderId: userDataStore.localUserData.id,
-    senderNickname: userDataStore.localUserData.nickname,
-    senderAvatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
-    receiverId: -1,
-    dateTime: new Date(),
-    contentType: ContentType.TEXT,
-    messageType: MessageType.GROUP_CHAT
-  };
-
-  chatRoomClient.send(JSON.stringify(newMessage));
-
-  messageContent.value = "";
-}
 
 chatRoomClient.addEventListener("open", () => {
+
   ElMessage({
+
     message: t("content.chatRoom.enterRoom"),
     showClose: true,
     type: "success",
     center: true
+
   });
+
 });
 
+
 chatRoomClient.addEventListener("message", (event) => {
+
   const wrappedMsgDataMap = JSON.parse(event.data);
   const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
 
   // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
   if (groupMessage.messageType >= 1703 && groupMessage.messageType <= 1706) {
+
     groupMessage.senderId = -1;
     groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
     groupMessage.senderAvatarUrl = "src/assets/icons/broadcast.svg";
+    groupMessage.contentType = ContentType.TEXT;
+
   }
 
   groupMessages.value.push(groupMessage);
@@ -281,40 +285,55 @@ chatRoomClient.addEventListener("message", (event) => {
   scrollToBottom();
 
   // 2024-8-26  14:39-如果本条消息是用户进入房间/退出房间的系统提示消息 , 则应该要启动一次刷新房间成员列表的任务
-  if (
-      groupMessage.messageType === MessageType.SYSTEM_USER_ENTER ||
-      groupMessage.messageType === MessageType.SYSTEM_USER_EXIT
-  ) {
+  if (groupMessage.messageType === MessageType.SYSTEM_USER_ENTER || groupMessage.messageType === MessageType.SYSTEM_USER_EXIT) {
+
     refreshContactList();
+
   }
+
 });
 
+
 chatRoomClient.addEventListener("error", (error) => {
+
   ElMessage({
+
     message: `${t("content.chatRoom.chatError")} : ${error.type}`,
     showClose: true,
     type: "warning",
     center: true
+
   });
+
 });
 
+
 chatRoomClient.addEventListener("close", (event) => {
+
   ElMessage({
+
     message: t("content.chatRoom.exitRoom"),
     showClose: true,
     type: "success",
     center: true
+
   });
 
   if (!event.wasClean) {
+
     ElMessage({
+
       message: t("content.chatRoom.chatError"),
       showClose: true,
       type: "warning",
       center: true
+
     });
+
   }
+
 });
+
 
 /**
  *
@@ -325,11 +344,16 @@ chatRoomClient.addEventListener("close", (event) => {
  *
  */
 function scrollToBottom() {
+
   nextTick(() => {
+
     // const scrollTop: number = chatMessageInnerRef.value.clientHeight - chatMessageRef.value.wrapRef.clientHeight;
     chatMessageRef.value.setScrollTop(chatMessageInnerRef.value.clientHeight);
+
   });
+
 }
+
 
 /**
  *
@@ -355,24 +379,30 @@ async function updateChatRoomInfo() {
  *
  */
 const refreshContactList = async () => {
+
   if (chatRoomInfo?.value?.id) {
-    const newChatRoomInfo: ChatRoom = (
-        await querySingleChatRoom(chatRoomInfo.value.id)
-    ).data;
+
+    const newChatRoomInfo: ChatRoom = (await querySingleChatRoom(chatRoomInfo.value.id)).data;
     chatRoomInfo.value = newChatRoomInfo;
     if (newChatRoomInfo.onlineUsers || newChatRoomInfo.onlineUsers?.size > 0) {
-      groupMembers.value = (
-          await queryUsersByIds(newChatRoomInfo?.onlineUsers)
-      ).data;
+
+      groupMembers.value = (await queryUsersByIds(newChatRoomInfo?.onlineUsers)).data;
+
     }
+
   }
+
 };
+
 
 // 2024-8-20  15:11-后台每10s刷新一次在线成员列表(延迟6s之后开始定时执行)
 let refreshContactListInterval: number;
 setTimeout(() => {
+
   refreshContactListInterval = setInterval(refreshContactList, 10000);
+
 }, 6000);
+
 
 /**
  *
@@ -383,15 +413,24 @@ setTimeout(() => {
  *
  */
 const updateContactList = async () => {
+
   try {
+
     isSpinning.value = true;
     await refreshContactList();
+
   } catch (err) {
+
     console.error(err);
+
   } finally {
+
     isSpinning.value = false;
+
   }
+
 };
+
 
 /**
  *
@@ -403,29 +442,163 @@ const updateContactList = async () => {
  *
  */
 function onSelectEmoji(emoji: EmojiExt) {
+
   const cursorOldIndex: number = chatInputRef?.value?.ref?.selectionStart;
-  messageContent.value =
-      messageContent.value.slice(0, cursorOldIndex) +
-      emoji.i +
-      messageContent.value.slice(cursorOldIndex);
+  messageContent.value = messageContent.value.slice(0, cursorOldIndex) + emoji.i + messageContent.value.slice(cursorOldIndex);
 
   chatInputRef.value.focus();
   isEmojiPanelVisible.value = false;
 
   nextTick(() => {
+
     const cursorNewIndex: number = cursorOldIndex + emoji.i.length;
     chatInputRef.value.ref.setSelectionRange(cursorNewIndex, cursorNewIndex);
+
   });
+
 }
 
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/4 PM 10:00:34
+ * @filename ChatRoom.vue
+ * @description 当多媒体文件选择元素中的文件列表出现变动时被触
+ *
+ */
+function handleMediaFileChange(event: Event) {
+
+  const file: File = (event.target as HTMLInputElement).files[0];
+  if (file) {
+
+    isChatInputDisabled.value = true;
+    waitingSendMediaFile.value = file;
+    contentType.value = ContentType.PHOTO;
+    messageContent.value = file.name;
+    console.log("禁用input");
+
+  } else {
+
+    // 2024-9-4  22:43-啥媒体文件都没有选择 , 则回退至文本发送模式
+    waitingSendMediaFile.value = undefined;
+    isChatInputDisabled.value = false;
+    contentType.value = ContentType.TEXT;
+    messageContent.value = "";
+    console.log("启用input");
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/4 PM 11:12:30
+ * @filename ChatRoom.vue
+ * @description 取消多媒体文件的选择&上传
+ *
+ */
+function cancelSendMediaFile() {
+
+  waitingSendMediaFile.value = undefined;
+  // 2024-9-4  23:13-只要取消当前非文本模式的发送操作 , 便统一回退至文本发送模式
+  contentType.value = ContentType.TEXT;
+  isChatInputDisabled.value = false;
+  messageContent.value = "";
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/8/21 PM 11:56:13
+ * @filename ChatRoom.vue
+ * @description 发送群聊消息
+ *
+ */
+async function sendMessage() {
+
+  try {
+
+    if (messageContent.value.trim() == "") {
+
+      ElMessage({
+
+        message: t("content.chatRoom.messageContentIsEmpty"),
+        showClose: true,
+        type: "warning",
+        center: true
+
+      });
+
+      // 2024-8-23  23:38-避免在持续回车的情况下发送消息导致消息发送失败而消息输入框中的内容出现多行文字的情况
+      messageContent.value = "";
+
+      return;
+
+    }
+
+    const newMessage: GroupMessage = {
+
+      id: randomUUID(),
+      content: messageContent.value,
+      senderId: userDataStore.localUserData.id,
+      senderNickname: userDataStore.localUserData.nickname,
+      senderAvatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
+      receiverId: -1,
+      dateTime: new Date(),
+      contentType: ContentType.TEXT,
+      messageType: MessageType.GROUP_CHAT
+
+    };
+
+    switch (contentType.value) {
+
+      case ContentType.PHOTO:
+
+        const dataUri: string = (await uploadMediaFile(userDataStore.localUserData.id, newMessage.id, ContentType.PHOTO, waitingSendMediaFile.value)).data;
+
+        if (dataUri) {
+
+          newMessage.contentType = ContentType.PHOTO;
+          newMessage.dataUri = dataUri;
+
+        }
+
+        break;
+
+    }
+
+    chatRoomClient.send(JSON.stringify(newMessage));
+
+  } finally {
+
+    // 2024-9-4  23:05-不管当前发送的消息类型是什么 , 发生完毕后统一重置为文本发送模式
+    waitingSendMediaFile.value = undefined;
+    isChatInputDisabled.value = false;
+    contentType.value = ContentType.TEXT;
+    messageContent.value = "";
+
+  }
+
+}
+
+
 onUnmounted(() => {
+
   // 2024-8-23  21:49-页面关闭将关闭连接 , 以防止资源泄漏
   chatRoomClient.close(1000, t("content.chatRoom.exitRoom"));
 
   // 2024-8-26  15:10-清除定时器 , 防止网络请求任务无线堆积
   clearInterval(refreshContactListInterval);
+
 });
+
 </script>
+
 
 <style scoped lang="scss">
 @use "@/style/dimensions" as *;
@@ -526,6 +699,7 @@ $contact-container-width: 11vw;
             color: #e5eaf3;
             padding: 5px 15px 5px 10px;
             border-radius: 0 20px 20px 20px;
+            overflow: hidden;
           }
 
           &:hover {

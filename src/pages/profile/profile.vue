@@ -570,7 +570,7 @@ function refreshUserData() {
  */
 function handleFileChange(event: Event) {
 
-  const file: File = event.target.files[0];
+  const file: File = (event.target as HTMLInputElement).files[0];
   if (file) {
 
     newAvatarFile = file;

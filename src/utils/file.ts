@@ -34,7 +34,7 @@ export function getFilenameFromPath(path: string, retainExtension: boolean = tru
 
     }
 
-    let filename: string = path.substring(lastSeparatorIndex);
+    let filename: string = path.substring(lastSeparatorIndex+1);
 
     if (!retainExtension) {
 

@@ -90,11 +90,18 @@ export default {
             groupMember: "群成员",
             chatInputPlaceholder: "善语结善缘，恶言伤人心~(拖动、粘贴文件到此，可发送文件)",
             messageContentIsEmpty: "消息内容为空!",
+            messageSendSucceed: "消息发送成功~",
+            messageSendFailed: "消息发送失败!",
             enterRoom: "正在进入房间...",
             enterRoomFailed: "进入房间失败",
             chatError: "聊天系统异常",
             exitRoom: "您 离开了房间",
-            systemBroadcast: "系统广播"
+            systemBroadcast: "系统广播",
+            confirmToDownloadFile: "您确定要下载该文件 %s 吗?",
+            fileDownload: "文件下载",
+            startDownloadFile: "开始下载文件 %s",
+            endDownloadFile: "文件 %s 下载完成",
+            cancelDownloadFile: "取消文件下载"
 
         },
         profile: {

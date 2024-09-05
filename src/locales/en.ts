@@ -87,11 +87,18 @@ export default {
             groupMember: "Group Member",
             chatInputPlaceholder: "Good words bind good ties,bad words hurt people~(Drag and paste the file here,you can send the file)",
             messageContentIsEmpty: "The message content is empty!",
+            messageSendSucceed: "Send message successfully~",
+            messageSendFailed: "Failed to send message!",
             enterRoom: "Entering the room...",
             enterRoomFailed: "Room entry failure",
             chatError: "Chat system exception",
             exitRoom: "You left the room",
-            systemBroadcast: "System Broadcast"
+            systemBroadcast: "System Broadcast",
+            confirmToDownloadFile: "Are you sure you want to download this file %s ?",
+            fileDownload: "File Download",
+            startDownloadFile: "Start downloading file %s",
+            endDownloadFile: "File %s has been downloaded",
+            cancelDownloadFile: "Cancel file download"
 
         },
         profile: {

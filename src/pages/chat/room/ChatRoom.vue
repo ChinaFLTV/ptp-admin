@@ -58,6 +58,11 @@
                     </template>
                   </el-image>
                 </div>
+                <div v-if="message.contentType==ContentType.FILE"
+                     style="padding: 0;width: 100px;height: 100px;display: flex;justify-content: center;align-items: center;"
+                     class="group-message-content-info-container" @click="showDownloadDialog(message)">
+                  <file-text-one theme="multi-color" size="24" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+                </div>
               </div>
             </div>
           </div>
@@ -84,23 +89,35 @@
               />
             </template>
           </el-popover>
+          <input style="display: none;" type="file" accept="image/*" ref="photoSelectRef"
+                 @change="handlePhotoChange">
           <picture-album
-              v-if="contentType==ContentType.TEXT"
+              v-if="contentType!=ContentType.PHOTO"
               theme="multi-color"
               style="margin-left: 10px"
               size="20"
               :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
               @click.prevent="photoSelectRef.click()"
           />
-          <error-picture v-if="contentType==ContentType.PHOTO" theme="multi-color" size="20" style="margin-left: 10px"
-                         :fill="['#000' ,'#d0021b' ,'#ffffff' ,'#43CCF8']" @click="cancelSendMediaFile"/>
-          <input style="display: none;" type="file" accept="image/*" id="picture-input" ref="photoSelectRef"
-                 @change="handleMediaFileChange">
+          <picture-album v-if="contentType==ContentType.PHOTO" theme="multi-color" size="20" style="margin-left: 10px"
+                         :fill="['#333', '#d0021b', '#FFF', '#43CCF8']" @click="cancelSendMediaFile"/>
+          <input style="display: none;" type="file" ref="fileSelectRef"
+                 @change="handleFileChange">
           <file-addition
+              v-if="contentType!=ContentType.FILE"
               theme="multi-color"
               style="margin-left: 10px"
               size="20"
               :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+              @click.prevent="fileSelectRef.click()"
+          />
+          <file-addition
+              v-if="contentType==ContentType.FILE"
+              theme="multi-color"
+              style="margin-left: 10px"
+              size="20"
+              :fill="['#333', '#d0021b', '#FFF', '#43CCF8']"
+              @click="cancelSendMediaFile"
           />
           <voice
               theme="multi-color"
@@ -188,8 +205,16 @@ import {useI18n} from "@/hooks/web/useI18n";
 import {GroupMessage, MessageType, querySingleChatRoom, uploadMediaFile} from "@/api/chat/room";
 import {UserDataStore} from "@/store/modules/user";
 import dayjs from "dayjs";
-import {EmotionHappy, ErrorPicture, FileAddition, PictureAlbum, Telegram, Voice} from "@icon-park/vue-next";
-import {ElMessage} from "element-plus";
+import {
+  EmotionHappy,
+  ErrorPicture,
+  FileAddition,
+  FileTextOne,
+  PictureAlbum,
+  Telegram,
+  Voice
+} from "@icon-park/vue-next";
+import {ElMessage, ElMessageBox} from "element-plus";
 import {
   DEFAULT_CHAT_ROOM_ID,
   PTP_USER_CHAT_BASE_URL,
@@ -206,11 +231,14 @@ import "vue3-emoji-picker/css";
 import {ContentType} from "@/model/po/ws/ContentType";
 import CountUp from "vue-countup-v3";
 import randomUUID from "@/utils/uuid";
+import {vsprintf} from "sprintf-js";
+import {getFilenameFromPath} from "@/utils/file";
 
 
 const messageTopBarRef: Ref = ref(null);
 const chatMessageRef: Ref = ref(null);
 const photoSelectRef: Ref = ref(null);
+const fileSelectRef: Ref = ref(null);
 const chatMessageInnerRef: Ref = ref(null);
 const chatInputRef: Ref = ref(null);
 const isSpinning: Ref<boolean> = ref(false);
@@ -229,8 +257,8 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
   senderId: 9,
   senderNickname: "鞠婧祎",
   senderAvatarUrl: "http://loveyou",
-  dataUri: JSON.parse(userDataStore.localUserData.avatar).uri,
-  contentType: ContentType.PHOTO,
+  dataUri: "https://ptp-chat-room-1309498949.cos.ap-nanjing.myqcloud.com/file/3622490032992-%E5%9C%A8%E8%AF%BB%E8%AF%81%E6%98%8E.pdf.pdf",
+  contentType: ContentType.FILE,
   messageType: MessageType.GROUP_CHAT
 
 } as GroupMessage]);
@@ -364,11 +392,14 @@ function scrollToBottom() {
  *
  */
 async function updateChatRoomInfo() {
+
   const res = await querySingleChatRoom(DEFAULT_CHAT_ROOM_ID);
   chatRoomInfo.value = res["data"];
 
   messageTopBarRef.value.style.backgroundImage = `url(${res["data"].avatarUrl})`;
+
 }
+
 
 /**
  *
@@ -435,6 +466,44 @@ const updateContactList = async () => {
 /**
  *
  * @author Lenovo/LiGuanda
+ * @date 2024/9/5 PM 8:44:26
+ * @filename ChatRoom.vue
+ * @description
+ *
+ */
+function showDownloadDialog(message: GroupMessage) {
+
+  ElMessageBox.confirm(
+      vsprintf(t("content.chatRoom.confirmToDownloadFile"), [decodeURIComponent(getFilenameFromPath(message.dataUri, true)) as string]),
+      t("content.chatRoom.fileDownload"),
+      {
+        confirmButtonText: t("common.button.confirm"),
+        cancelButtonText: t("common.button.cancel"),
+        type: "info"
+      }
+  ).then(() => {
+
+    ElMessage({
+
+      message: vsprintf(t("content.chatRoom.startDownloadFile"), [decodeURIComponent(getFilenameFromPath(message.dataUri, true)) as string]),
+      showClose: true,
+      type: "info",
+      center: true
+
+    });
+
+    // 2024-9-5  22:25-下载文件体积较大&传参量不大 , 则建议使用get方式下载文件 , 该种方式下回自动打开然后关闭新的窗口 , 不会阻塞住 , 对用户体验很友好
+    // 文件体积不大或者传参量比较大 , 则建议使用post方式去下载(手动创建一个用于download的a元素并模拟点击) , 该方式不会打开新页面
+    // 资料来源 : https://www.cnblogs.com/zzwlong/p/15540482.html
+    window.open(message.dataUri);
+
+  });
+
+}
+
+/**
+ *
+ * @author Lenovo/LiGuanda
  * @date 2024/8/27 PM 9:39:42
  * @filename ChatRoom.vue
  * @param emoji {EmojiExt} 用户选择的表情
@@ -464,10 +533,10 @@ function onSelectEmoji(emoji: EmojiExt) {
  * @author Lenovo/LiGuanda
  * @date 2024/9/4 PM 10:00:34
  * @filename ChatRoom.vue
- * @description 当多媒体文件选择元素中的文件列表出现变动时被触
+ * @description 当图片选择元素中的文件列表出现变动时被触
  *
  */
-function handleMediaFileChange(event: Event) {
+function handlePhotoChange(event: Event) {
 
   const file: File = (event.target as HTMLInputElement).files[0];
   if (file) {
@@ -476,7 +545,37 @@ function handleMediaFileChange(event: Event) {
     waitingSendMediaFile.value = file;
     contentType.value = ContentType.PHOTO;
     messageContent.value = file.name;
-    console.log("禁用input");
+
+  } else {
+
+    // 2024-9-5  19:51-啥媒体文件都没有选择 , 则回退至文本发送模式
+    waitingSendMediaFile.value = undefined;
+    isChatInputDisabled.value = false;
+    contentType.value = ContentType.TEXT;
+    messageContent.value = "";
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/5 PM 7:49:00
+ * @filename ChatRoom.vue
+ * @description 当文件选择元素中的文件列表出现变动时被触
+ *
+ */
+function handleFileChange(event: Event) {
+
+  const file: File = (event.target as HTMLInputElement).files[0];
+  if (file) {
+
+    isChatInputDisabled.value = true;
+    waitingSendMediaFile.value = file;
+    contentType.value = ContentType.FILE;
+    messageContent.value = file.name;
 
   } else {
 
@@ -485,7 +584,6 @@ function handleMediaFileChange(event: Event) {
     isChatInputDisabled.value = false;
     contentType.value = ContentType.TEXT;
     messageContent.value = "";
-    console.log("启用input");
 
   }
 
@@ -559,12 +657,25 @@ async function sendMessage() {
 
       case ContentType.PHOTO:
 
-        const dataUri: string = (await uploadMediaFile(userDataStore.localUserData.id, newMessage.id, ContentType.PHOTO, waitingSendMediaFile.value)).data;
+        const dataUri1: string = (await uploadMediaFile(userDataStore.localUserData.id, newMessage.id, ContentType.PHOTO, waitingSendMediaFile.value)).data;
 
-        if (dataUri) {
+        if (dataUri1) {
 
           newMessage.contentType = ContentType.PHOTO;
-          newMessage.dataUri = dataUri;
+          newMessage.dataUri = dataUri1;
+
+        }
+
+        break;
+
+      case ContentType.FILE:
+
+        const dataUri2: string = (await uploadMediaFile(userDataStore.localUserData.id, newMessage.id, ContentType.FILE, waitingSendMediaFile.value)).data;
+
+        if (dataUri2) {
+
+          newMessage.contentType = ContentType.FILE;
+          newMessage.dataUri = dataUri2;
 
         }
 
@@ -573,6 +684,18 @@ async function sendMessage() {
     }
 
     chatRoomClient.send(JSON.stringify(newMessage));
+
+  } catch (e) {
+
+    console.error(e);
+    ElMessage({
+
+      message: t("content.chatRoom.messageSendFailed"),
+      showClose: true,
+      type: "error",
+      center: true
+
+    });
 
   } finally {
 

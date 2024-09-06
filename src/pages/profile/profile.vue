@@ -218,7 +218,7 @@ let newAvatarFile: File = undefined;
 const fileReader: FileReader = new FileReader();
 fileReader.onload = e => {
 
-  newAvatarUri.value = e.target.result;
+  newAvatarUri.value = e.target.result as string;
 
 };
 fileReader.onerror = err => {

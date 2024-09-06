@@ -63,6 +63,10 @@
                      class="group-message-content-info-container" @click="showDownloadDialog(message)">
                   <file-text-one theme="multi-color" size="24" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
                 </div>
+                <div v-if="message.contentType==ContentType.VOICE" class="group-message-content-info-container"
+                     style="padding: 5px 30px;" @click="isAudioPlaying?pausePlayAudio():playAudio(message)">
+                  <waves-right theme="multi-color" size="24" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+                </div>
               </div>
             </div>
           </div>
@@ -85,7 +89,7 @@
                   @click="isEmojiPanelVisible = !isEmojiPanelVisible"
                   theme="multi-color"
                   size="20"
-                  :fill="['#333', '#2F88FF', '#FFF', '#43CCF8']"
+                  :fill="['#333', isEmojiPanelVisible?'#d0021b':'#2F88FF', '#FFF', '#43CCF8']"
               />
             </template>
           </el-popover>
@@ -117,13 +121,14 @@
               style="margin-left: 10px"
               size="20"
               :fill="['#333', '#d0021b', '#FFF', '#43CCF8']"
-              @click="cancelSendMediaFile"
+              @click="endSendMediaFile"
           />
           <voice
               theme="multi-color"
               style="margin-left: 10px"
               size="20"
               :fill="['#FFF', '#2F88FF', '#FFF', '#43CCF8']"
+              @click="isVoiceRecorderDialogVisible = true"
           />
         </div>
         <div class="message-input-bottom-half-container">
@@ -197,6 +202,27 @@
       </div>
     </div>
   </div>
+
+
+  <!--  2024-9-5  22:55-下面为录音对话框  -->
+  <el-dialog style="border-radius: 20px;" v-model="isVoiceRecorderDialogVisible"
+             :title="t('content.chatRoom.voiceRecordSend')"
+             :width="420"
+             @close="endVoiceRecord"
+             draggable center>
+
+    <tapir-widget :time="1"
+                  :customUpload="confirmSendVoice"
+                  :successfulUpload="sendVoiceSuccessfully"
+                  :failedUpload="endSendMediaFile"
+                  buttonColor="green"/>
+
+  </el-dialog>
+
+  <!--  2024-9-6  23:05-该组件将不会出现在用户界面中 , 主要用于进行功能实现 , 同时也为了尽可能的实现组件的复用  -->
+  <audio style="display: none;" ref="audioPlayRef" @play="isAudioPlaying = true"
+         @pause="isAudioPlaying = false" @ended="isAudioPlaying=false;playingAudioMessage=null;"></audio>
+
 </template>
 
 <script setup lang="ts">
@@ -212,7 +238,8 @@ import {
   FileTextOne,
   PictureAlbum,
   Telegram,
-  Voice
+  Voice,
+  WavesRight
 } from "@icon-park/vue-next";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {
@@ -233,21 +260,28 @@ import CountUp from "vue-countup-v3";
 import randomUUID from "@/utils/uuid";
 import {vsprintf} from "sprintf-js";
 import {getFilenameFromPath} from "@/utils/file";
+import TapirWidget from "vue-audio-tapir";
+import "vue-audio-tapir/dist/vue-audio-tapir.css";
 
 
 const messageTopBarRef: Ref = ref(null);
 const chatMessageRef: Ref = ref(null);
+const audioPlayRef: Ref<HTMLAudioElement> = ref(null);
 const photoSelectRef: Ref = ref(null);
 const fileSelectRef: Ref = ref(null);
 const chatMessageInnerRef: Ref = ref(null);
 const chatInputRef: Ref = ref(null);
 const isSpinning: Ref<boolean> = ref(false);
 
+
 const isEmojiPanelVisible: Ref<boolean> = ref(false);
+const isVoiceRecorderDialogVisible: Ref<boolean> = ref(false);
 const isChatInputDisabled: Ref<boolean> = ref(false);
+
 
 const {t} = useI18n();
 const userDataStore = UserDataStore();
+
 
 // 2024-8-14  22:44-聊天室在线用户信息列表
 const groupMembers: Ref<Array<User>> = ref([]);
@@ -257,8 +291,8 @@ const groupMessages: Ref<GroupMessage[]> = ref([{
   senderId: 9,
   senderNickname: "鞠婧祎",
   senderAvatarUrl: "http://loveyou",
-  dataUri: "https://ptp-chat-room-1309498949.cos.ap-nanjing.myqcloud.com/file/3622490032992-%E5%9C%A8%E8%AF%BB%E8%AF%81%E6%98%8E.pdf.pdf",
-  contentType: ContentType.FILE,
+  dataUri: "https://ptp-chat-room-1309498949.cos.ap-nanjing.myqcloud.com/voice/8815597118390.wav",
+  contentType: ContentType.VOICE,
   messageType: MessageType.GROUP_CHAT
 
 } as GroupMessage]);
@@ -273,6 +307,10 @@ const chatRoomClient: WebSocket = new WebSocket(`${PTP_WEB_SITE_WEBSOCKET_URL}${
 const waitingSendMediaFile: Ref<File> = ref();
 // 2024-9-4  22:42-当前发送消息的内容类型
 const contentType: Ref<ContentType> = ref(ContentType.TEXT);
+// 2024-9-6  22:52-当前是否有音频正在播放
+const isAudioPlaying: Ref<boolean> = ref(false);
+// 2024-9-6  23:17-存储当前正在播放音频的所属消息
+const playingAudioMessage: Ref<GroupMessage> = ref(null);
 
 
 // 2024-8-24  09:57-获取一下最新的房间数据
@@ -468,7 +506,8 @@ const updateContactList = async () => {
  * @author Lenovo/LiGuanda
  * @date 2024/9/5 PM 8:44:26
  * @filename ChatRoom.vue
- * @description
+ * @param message {GroupMessage} 当前所要下载的文件消息
+ * @description 显示文件下载确认对话框
  *
  */
 function showDownloadDialog(message: GroupMessage) {
@@ -500,6 +539,52 @@ function showDownloadDialog(message: GroupMessage) {
   });
 
 }
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/6 PM 10:56:17
+ * @filename ChatRoom.vue
+ * @param message {GroupMessage} 当前所要播放的音频消息
+ * @description 播放音频
+ *
+ */
+function playAudio(message: GroupMessage) {
+
+  if (!isAudioPlaying.value) {
+
+    // 2024-9-6  23:15-重置当前的播放偏移量为0
+    audioPlayRef.value.currentTime = 0;
+    audioPlayRef.value.src = message.dataUri;
+    audioPlayRef.value.play();
+    isAudioPlaying.value = true;
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/6 PM 11:23:11
+ * @filename ChatRoom.vue
+ * @description 暂停音频的播放
+ *
+ */
+function pausePlayAudio() {
+
+  if (isAudioPlaying.value) {
+
+    audioPlayRef.value.pause();
+    playingAudioMessage.value = null;
+    isAudioPlaying.value = false;
+
+  }
+
+}
+
 
 /**
  *
@@ -595,16 +680,102 @@ function handleFileChange(event: Event) {
  * @author Lenovo/LiGuanda
  * @date 2024/9/4 PM 11:12:30
  * @filename ChatRoom.vue
- * @description 取消多媒体文件的选择&上传
+ * @description 不管音频文件上传成功与否都要进行的回调
  *
  */
-function cancelSendMediaFile() {
+function sendVoiceSuccessfully() {
+
+  ElMessage({
+
+    message: t("content.chatRoom.sendRecordSuccessfully"),
+    showClose: true,
+    type: "success",
+    center: true
+
+  });
 
   waitingSendMediaFile.value = undefined;
   // 2024-9-4  23:13-只要取消当前非文本模式的发送操作 , 便统一回退至文本发送模式
   contentType.value = ContentType.TEXT;
   isChatInputDisabled.value = false;
   messageContent.value = "";
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/5 PM 10:57:43
+ * @param file {File} 录制好的音频文件
+ * @filename ChatRoom.vue
+ * @description 点击确定发送录音按钮后触发的回调
+ *
+ */
+function confirmSendVoice(file: File) {
+
+  try {
+
+    if (file) {
+
+      contentType.value = ContentType.VOICE;
+      waitingSendMediaFile.value = file;
+      sendMessage();
+
+    }
+
+  } catch (e) {
+
+    console.error(e);
+    ElMessage({
+
+      message: t("content.chatRoom.messageSendFailed"),
+      showClose: true,
+      type: "error",
+      center: true
+
+    });
+
+  } finally {
+
+    // 2024-9-5  22:59-不管当前发送的消息类型是什么 , 发生完毕后统一重置为文本发送模式
+    waitingSendMediaFile.value = undefined;
+    isChatInputDisabled.value = false;
+    contentType.value = ContentType.TEXT;
+    messageContent.value = "";
+
+    isVoiceRecorderDialogVisible.value = false;
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/5 PM 11:10:43
+ * @filename ChatRoom.vue
+ * @description 取消录音的回调
+ *
+ */
+function endSendMediaFile() {
+
+  /*ElMessage({
+
+    message: t("content.chatRoom.sendRecordFailed"),
+    showClose: true,
+    type: "error",
+    center: true
+
+  });*/
+
+  waitingSendMediaFile.value = undefined;
+  isChatInputDisabled.value = false;
+  contentType.value = ContentType.TEXT;
+  messageContent.value = "";
+
+  isVoiceRecorderDialogVisible.value = false;
 
 }
 
@@ -621,7 +792,7 @@ async function sendMessage() {
 
   try {
 
-    if (messageContent.value.trim() == "") {
+    if (contentType.value == ContentType.TEXT && messageContent.value.trim() == "") {
 
       ElMessage({
 
@@ -676,6 +847,19 @@ async function sendMessage() {
 
           newMessage.contentType = ContentType.FILE;
           newMessage.dataUri = dataUri2;
+
+        }
+
+        break;
+
+      case ContentType.VOICE:
+
+        const dataUri3: string = (await uploadMediaFile(userDataStore.localUserData.id, newMessage.id, ContentType.VOICE, waitingSendMediaFile.value)).data;
+
+        if (dataUri3) {
+
+          newMessage.contentType = ContentType.VOICE;
+          newMessage.dataUri = dataUri3;
 
         }
 
@@ -993,4 +1177,17 @@ $contact-container-width: 11vw;
     }
   }
 }
+
+
+.change-avatar-dialog-item {
+
+  display: block;
+  margin: 10px 10px 10px; // 2024-8-12  10:51-覆盖ElementUI plus中的默认margin配置
+  width: 400px;
+  height: 50px;
+  letter-spacing: 4px;
+
+}
+
+
 </style>

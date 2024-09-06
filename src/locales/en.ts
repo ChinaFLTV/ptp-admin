@@ -98,7 +98,16 @@ export default {
             fileDownload: "File Download",
             startDownloadFile: "Start downloading file %s",
             endDownloadFile: "File %s has been downloaded",
-            cancelDownloadFile: "Cancel file download"
+            cancelDownloadFile: "Cancel file download",
+            voiceRecordSend: "Send the voice",
+            confirmSend: "Confirm Send",
+            endRecord: "End Record",
+            sendRecordSuccessfully: "Recording sent successfully",
+            sendRecordFailed: "Failed to send recording",
+            voicePlaying: "Playing audio",
+            voicePlaySuccessfully: "Audio playback successful",
+            voicePlayFailed: "Audio playback failure",
+            voiceLoading: "Audio loading"
 
         },
         profile: {

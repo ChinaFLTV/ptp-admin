@@ -101,7 +101,16 @@ export default {
             fileDownload: "文件下载",
             startDownloadFile: "开始下载文件 %s",
             endDownloadFile: "文件 %s 下载完成",
-            cancelDownloadFile: "取消文件下载"
+            cancelDownloadFile: "取消文件下载",
+            voiceRecordSend: "录音发送",
+            confirmSend: "确认发送",
+            endRecord: "结束录音",
+            sendRecordSuccessfully: "录音发送成功",
+            sendRecordFailed: "录音发送失败",
+            voicePlaying: "正在播放音频",
+            voicePlaySuccessfully: "音频播放成功",
+            voicePlayFailed: "音频播放失败",
+            voiceLoading: "音频加载中"
 
         },
         profile: {

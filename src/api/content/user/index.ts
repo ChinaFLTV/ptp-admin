@@ -11,6 +11,7 @@ import {Result} from "@/model/po/response/Result";
 import {User} from "@/model/po/manage/User";
 import {UserVo} from "@/model/vo/UserVo";
 import {AddressInfo} from "@/model/po/info/AddressInfo";
+import {ResponseStatus} from "@/enums/ResponseStatus";
 
 /**
  * @author LiGuanda
@@ -55,9 +56,24 @@ export const queryUserPage = async (offset: number, limit: number): Promise<Resu
  */
 export const queryUsersByIds = async (ids: Set<number>): Promise<Result<User[]>> => {
 
-    // 2024-8-26  16:35-由于Axios会自动预处理集合类型的参数(ids=xx1&ids=xx2&ids=xx3 => ids[]=xxx) , 所以我们需要自己手动拼接集合类型的Query参数
-    const queryString: string = [...ids].map(id => `ids=${id}`).join("&");
-    return await service.get(`${PTP_USER_BASE_URL}/query/byIds?${queryString}`);
+    // 2024-9-6  21:21-只有在查询人数大于0时才发送查询请求 , 否则一方面将导致不必要的请求 , 另一方面也会因无法拼接参数导致服务端意外报错
+    if (ids.length > 0) {
+
+        // 2024-8-26  16:35-由于Axios会自动预处理集合类型的参数(ids=xx1&ids=xx2&ids=xx3 => ids[]=xxx) , 所以我们需要自己手动拼接集合类型的Query参数
+        const queryString: string = [...ids].map(id => `ids=${id}`).join("&");
+        return await service.get(`${PTP_USER_BASE_URL}/query/byIds?${queryString}`);
+
+    } else {
+
+        return {
+
+            status: ResponseStatus.SUCCESS,
+            time: new Date(),
+            data: []
+
+        } as Result<User[]>;
+
+    }
 
 };
 

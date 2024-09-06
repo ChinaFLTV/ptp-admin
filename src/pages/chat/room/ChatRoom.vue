@@ -64,8 +64,12 @@
                   <file-text-one theme="multi-color" size="24" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
                 </div>
                 <div v-if="message.contentType==ContentType.VOICE" class="group-message-content-info-container"
-                     style="padding: 5px 30px;" @click="isAudioPlaying?pausePlayAudio():playAudio(message)">
+                     style="display:flex;align-items:center;justify-content:start;padding: 5px 30px;"
+                     @click="isAudioPlaying?pausePlayAudio():playAudio(message)">
                   <waves-right theme="multi-color" size="24" :fill="['#333' ,'#2F88FF' ,'#FFF' ,'#43CCF8']"/>
+                  <div :class="[isAudioPlaying?'audioPlaying':'audioNotPlaying']"
+                       style="margin-left: 10px;margin-bottom: 2px;">●
+                  </div>
                 </div>
               </div>
             </div>
@@ -908,8 +912,11 @@ onUnmounted(() => {
 
 
 <style scoped lang="scss">
+
+
 @use "@/style/dimensions" as *;
 @use "@/style/themes/default" as *;
+
 
 $dark-background: #323644;
 $dark-primary-text: #e5eaf3;
@@ -920,7 +927,9 @@ $message-top-bar-container-height: 5vh;
 $message-input-container-height: 16vh;
 $contact-container-width: 11vw;
 
+
 .chat-room-container {
+
   width: $chat-room-container-width;
   height: $chat-room-container-height;
   max-height: $chat-room-container-height;
@@ -930,6 +939,7 @@ $contact-container-width: 11vw;
   align-items: center;
 
   .message-container {
+
     flex: 9;
     height: 100%;
     margin-right: 10px;
@@ -939,6 +949,7 @@ $contact-container-width: 11vw;
     align-items: center;
 
     .message-top-bar-container {
+
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -953,19 +964,20 @@ $contact-container-width: 11vw;
       background-size: cover;
 
       .room-name-container {
+
         font-size: $global-middle-window-primary-font-size;
         letter-spacing: $global-middle-window-primary-letter-spacing;
         font-weight: bold;
         color: $dark-primary-text;
+
       }
+
     }
 
     .message-content-container {
+
       width: 100%;
-      height: calc(
-          #{$chat-room-container-height} - #{$message-top-bar-container-height} -
-          #{$message-input-container-height}
-      ); // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
+      height: calc(#{$chat-room-container-height} - #{$message-top-bar-container-height} - #{$message-input-container-height}); // 2024-8-22  00:18-避免聊天记录滚动区域意外溢出(至于为什么是这个数值，我也不清楚，我一下子给了这个数值，就)
       background-color: $dark-background;
       padding: 20px 0;
 
@@ -992,65 +1004,122 @@ $contact-container-width: 11vw;
             margin-bottom: 2px;
 
             .group-message-senderId-info-container {
+
               display: none;
+
             }
 
             .group-message-datetime-info-container {
+
               margin-left: 10px;
               display: none;
+
             }
+
           }
 
           .group-message-content-info-container {
+
             background-color: #484d5f;
             color: #e5eaf3;
             padding: 5px 15px 5px 10px;
             border-radius: 0 20px 20px 20px;
             overflow: hidden;
+
+            .audioPlaying {
+
+              animation: twinkle 2s linear infinite;
+
+            }
+
+            .audioNotPlaying {
+
+              display: none;
+
+            }
+
+            @keyframes twinkle {
+
+              from {
+
+                color: transparent;
+
+              }
+
+              to {
+
+                color: greenyellow;
+
+              }
+
+            }
+
           }
 
           &:hover {
+
             .group-message-nickname-info-container {
+
               .group-message-senderId-info-container {
+
                 color: $dark-secondary-text;
                 display: inline;
+
               }
 
               .group-message-datetime-info-container {
+
                 color: $dark-secondary-text;
                 display: inline;
+
               }
+
             }
+
           }
+
         }
+
       }
 
       .reversed {
+
         flex-direction: row-reverse;
         justify-content: end;
 
         .group-message-content-container {
+
           align-items: end;
           margin-right: 10px;
 
           .group-message-nickname-info-container {
+
             flex-direction: row-reverse;
             justify-content: end;
 
             .group-message-datetime-info-container {
+
               margin-right: 10px;
+
             }
+
           }
 
           .group-message-content-info-container {
+
             border-radius: 20px 0 20px 20px;
             padding: 5px 10px 5px 15px;
+
           }
+
         }
+
       }
+
     }
 
     .message-input-container {
+
       height: $message-input-container-height;
       width: 100%;
       padding: 15px;
@@ -1062,17 +1131,22 @@ $contact-container-width: 11vw;
       justify-content: center;
 
       .message-extension-container {
+
         display: flex;
         flex-direction: row;
         justify-content: start;
         align-items: center;
 
         .message-extension-emoji-container {
+
           padding: 0 !important;
+
         }
+
       }
 
       .message-input-bottom-half-container {
+
         width: 100%;
         display: flex;
         flex-direction: row;
@@ -1080,31 +1154,44 @@ $contact-container-width: 11vw;
         align-items: end;
 
         ::v-deep(.el-textarea__inner) {
+
           padding: 0;
           box-shadow: none;
           border: none;
           background-color: transparent;
           color: #bfbbb4;
+
         }
 
         ::v-deep(.el-input__count) {
+
           background-color: transparent;
+
         }
 
         .message-input-component {
+
           font-size: 16px;
+
         }
 
         .send-message-icon {
+
           margin-left: 10px;
           cursor: pointer;
+
         }
+
       }
+
     }
+
   }
 
   .contact-container {
+
     $top-bar-height: 5vh;
+
 
     display: flex;
     flex-direction: column;
@@ -1114,6 +1201,7 @@ $contact-container-width: 11vw;
     height: 100%;
 
     .contact-top-bar-container {
+
       display: flex;
       flex-direction: row;
       justify-content: start;
@@ -1126,24 +1214,34 @@ $contact-container-width: 11vw;
       font-size: 0.8vw;
 
       .spinning {
+
         animation: spin 1s;
         animation-iteration-count: infinite;
         animation-timing-function: linear;
         animation-fill-mode: forwards;
+
       }
 
       @keyframes spin {
+
         from {
+
           transform: rotate(0deg);
+
         }
 
         to {
+
           transform: rotate(360deg);
+
         }
+
       }
+
     }
 
     .contact-list-container {
+
       width: 100%;
       height: calc(100% - #{$top-bar-height});
       border-radius: 0 0 $global-dialog-radius $global-dialog-radius;
@@ -1159,12 +1257,15 @@ $contact-container-width: 11vw;
         height: 50px;
 
         &:hover {
+
           color: #e5eaf3;
           border-radius: 10px;
           background-color: #484d5f;
+
         }
 
         .group-member-info-nickname-container {
+
           max-width: 120px;
           margin-left: 10px;
           font-size: 12px;
@@ -1172,10 +1273,15 @@ $contact-container-width: 11vw;
           overflow: hidden;
           text-overflow: ellipsis;
           color: #a6a9ad;
+
         }
+
       }
+
     }
+
   }
+
 }
 
 

@@ -17,28 +17,8 @@
 
 <style scoped lang="scss">
 
-.emptyContainer {
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+@import "empty.module";
 
-  .emptyLogo {
-
-    width: 400px;
-    height: 400px;
-
-  }
-
-  .emptyTips {
-
-    font-weight: bolder;
-    margin-top: 3rem;
-    letter-spacing: 1rem;
-
-  }
-
-}
 
 </style>

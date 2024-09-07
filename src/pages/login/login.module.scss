@@ -1,0 +1,93 @@
+/**
+*
+* @author Lenovo/LiGuanda
+* @date 2024/9/7 AM 11:05:11
+* @filename login.module.scss
+* @description Login组件的配套样式
+*
+*/
+
+.loginContainer {
+
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/src/assets/image/login_background.webp");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-clip: border-box;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > .formContainer {
+
+    width: 32vw;
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 30px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 30px 10px rgb(0, 0, 0, 0.3);
+
+    > .loginTitle {
+
+      font-size: 1.5rem;
+      font-weight: bolder;
+      letter-spacing: 5px;
+      margin-bottom: 40px;
+
+    }
+
+    > .inputContainer {
+
+      width: 60%;
+      height: 40px;
+      margin-bottom: 40px;
+      box-sizing: border-box;
+      border-radius: 8px;
+
+      &:focus-within {
+
+        box-shadow: 0 0 15px 8px #ffffad;
+
+      }
+
+      :deep(.el-input__wrapper) {
+
+        background: rgb(0, 0, 0, 0.2);
+        border: 0 !important;
+
+        :deep(.el-input__inner) {
+
+          border: 0 !important;
+
+        }
+
+      }
+
+    }
+
+    > .loginButton {
+
+      width: 35%;
+      height: 35px;
+      color: #03e9f4;
+      background: transparent;
+      letter-spacing: 4px;
+
+      &:hover {
+
+        background-color: #03e9f4;
+        color: #050801;
+        box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
+
+      }
+
+    }
+
+  }
+
+}

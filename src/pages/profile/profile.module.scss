@@ -1,0 +1,132 @@
+/**
+*
+* @author Lenovo/LiGuanda
+* @date 2024/9/7 AM 11:04:22
+* @filename profile.module.scss
+* @description Profile组件的配套样式
+*
+*/
+
+.user-profile-container {
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+
+  > .profileTitle {
+
+    letter-spacing: 1rem;
+    color: black;
+    font-weight: bolder;
+    margin-top: 3rem;
+    margin-left: 3rem;
+
+  }
+
+  .halfProfileArea {
+
+    flex: 1;
+    padding-left: 3rem;
+    margin-top: 3rem;
+
+
+    > .profileKey {
+
+      font-weight: bolder;
+      color: black;
+      letter-spacing: 0.1rem;
+
+    }
+
+    > .profileValue {
+
+      margin-top: 1rem;
+      margin-bottom: 3rem;
+      color: dimgray;
+
+    }
+
+    .modify {
+
+      color: #1cab5b;
+      margin-left: 1rem;
+
+      &:hover {
+
+        color: #3ac979;
+        cursor: pointer;
+        text-decoration: underline;
+
+      }
+
+    }
+
+    .avatar-container {
+
+      display: flex;
+      flex-direction: row;
+      justify-content: start;
+      align-items: center;
+      margin: 2rem auto 2rem auto;
+
+      .avatar {
+
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+
+        &:hover {
+
+          cursor: pointer;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  .modifyPasswordLabel {
+
+    margin: 1.5rem 0 1.5rem 0;
+
+  }
+
+  .change-avatar-dialog-container {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    #picture-input {
+
+      display: none;
+
+    }
+
+    .change-avatar-dialog-item {
+
+      display: block;
+      margin: 10px 10px 10px; // 2024-8-12  10:51-覆盖ElementUI plus中的默认margin配置
+      width: 400px;
+      height: 50px;
+      letter-spacing: 4px;
+
+      .change-avatar-dialog-avatar-slot-container {
+
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+      }
+
+    }
+
+  }
+
+}

@@ -36,14 +36,8 @@ onMounted(() => {
 
 <style scoped lang="scss">
 
-// @import 'lazyframe/src/scss';
 
-.browser-container {
+@import "browser.moduule";
 
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-
-}
 
 </style>

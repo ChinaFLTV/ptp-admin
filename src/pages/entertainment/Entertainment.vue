@@ -10,4 +10,8 @@
 
 <style scoped lang="scss">
 
+
+@import "entertainment.module";
+
+
 </style>

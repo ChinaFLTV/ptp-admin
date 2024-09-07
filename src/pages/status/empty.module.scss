@@ -1,0 +1,32 @@
+/**
+*
+* @author Lenovo/LiGuanda
+* @date 2024/9/7 AM 11:06:24
+* @filename empty.module.scss
+* @description 空状态组件的配套样式
+*
+*/
+
+.emptyContainer {
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .emptyLogo {
+
+    width: 400px;
+    height: 400px;
+
+  }
+
+  .emptyTips {
+
+    font-weight: bolder;
+    margin-top: 3rem;
+    letter-spacing: 1rem;
+
+  }
+
+}

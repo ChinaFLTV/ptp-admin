@@ -10,10 +10,10 @@
 import * as VueRouter from "vue-router";
 import {routes} from "@/router/modules/routes";
 import {NavigateStore} from "@/store/modules/navigate";
-import randomUUID from "@/utils/uuid";
 import {NavigationType} from "@/enums/NavigationType";
 import {Page} from "@/model/view/page";
 import {App} from "vue";
+import {randomUUID} from "@/utils/id";
 
 
 // 2024-2-7  15:24-每个路由都需要映射到一个组件

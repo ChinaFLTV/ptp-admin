@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="message-content-container">
-        <el-scrollbar id="messageContentContainer" ref="chatMessageRef">
+        <el-scrollbar id="messageContentContainer" ref="chatMessageRef" @scroll="handleMessagePanelScroll">
           <div ref="chatMessageInnerRef">
             <div
                 v-for="message in groupMessages"
@@ -264,11 +264,13 @@ import EmojiPicker, {EmojiExt} from "vue3-emoji-picker";
 import "vue3-emoji-picker/css";
 import {ContentType} from "@/model/po/ws/ContentType";
 import CountUp from "vue-countup-v3";
-import randomUUID from "@/utils/uuid";
+import {randomSnowID} from "@/utils/id";
 import {vsprintf} from "sprintf-js";
 import {getFilenameFromPath} from "@/utils/file";
 import TapirWidget from "vue-audio-tapir";
 import "vue-audio-tapir/dist/vue-audio-tapir.css";
+import {queryGroupMessagePage} from "@/api/chat/groupMessage";
+import {Result} from "@/model/po/response/Result";
 
 
 const messageTopBarRef: Ref = ref(null);
@@ -318,10 +320,10 @@ const contentType: Ref<ContentType> = ref(ContentType.TEXT);
 const isAudioPlaying: Ref<boolean> = ref(false);
 // 2024-9-6  23:17-存储当前正在播放音频的所属消息
 const playingAudioMessage: Ref<GroupMessage> = ref(null);
-
-
-// 2024-8-24  09:57-获取一下最新的房间数据
-updateChatRoomInfo();
+// 2024-9-11  22:32-标记当前正在请求的历史聊天数据的页码数
+const currentGroupMessagePageNumber: Ref<number> = ref(0);
+// 2024-9-12  22:35-标记当前是否正在拉取历史聊天数据集
+const isFetchingHistoryMessages: Ref<boolean> = ref(false);
 
 
 chatRoomClient.addEventListener("open", () => {
@@ -340,21 +342,11 @@ chatRoomClient.addEventListener("open", () => {
 
 chatRoomClient.addEventListener("message", (event) => {
 
-  console.log("==========收到消息=========");
-  console.log(event.data);
-
   const wrappedMsgDataMap = JSON.parse(event.data);
   const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
 
   // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
-  if (groupMessage.messageType >= 1703 && groupMessage.messageType <= 1706) {
-
-    groupMessage.senderId = -1;
-    groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
-    groupMessage.senderAvatarUrl = "src/assets/icons/broadcast.svg";
-    groupMessage.contentType = ContentType.TEXT;
-
-  }
+  processGroupMessage(groupMessage);
 
   groupMessages.value.push(groupMessage);
 
@@ -409,6 +401,89 @@ chatRoomClient.addEventListener("close", (event) => {
   }
 
 });
+
+
+onMounted(async () => {
+
+  // 2024-8-24  09:57-获取一下最新的房间数据
+  await updateChatRoomInfo();
+
+});
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/11 PM 11:21:56
+ * @filename ChatRoom.vue
+ * @param groupMessage {GroupMessage} 残缺不全的系统消息
+ * @description 加工处理接收到的群聊消息(主要功能是给系统消息填充一些缺失的信息数据)
+ *
+ */
+function processGroupMessage(groupMessage: GroupMessage) {
+
+  if (!groupMessage) {
+
+    return;
+
+  }
+
+  if (groupMessage.messageType >= 1703 && groupMessage.messageType <= 1706) {
+
+    groupMessage.senderId = -1;
+    groupMessage.senderNickname = t("content.chatRoom.systemBroadcast");
+    groupMessage.senderAvatarUrl = "src/assets/icons/broadcast.svg";
+    groupMessage.contentType = ContentType.TEXT;
+
+  }
+
+}
+
+
+/**
+ *
+ * @author Lenovo/LiGuanda
+ * @date 2024/9/12 PM 9:48:10
+ * @filename ChatRoom.vue
+ * @description 消息容器上下滚动时将触发该回调函数
+ *
+ */
+async function handleMessagePanelScroll() {
+
+  const topDistance: number = chatMessageInnerRef.value.scrollTop;
+
+  if (topDistance < 1 && !isFetchingHistoryMessages.value) {
+
+    try {
+
+      isFetchingHistoryMessages.value = true;
+      const oldClientHeight: number = chatMessageInnerRef.value.clientHeight;
+
+      const res: Result<GroupMessage[]> = await queryGroupMessagePage(666, currentGroupMessagePageNumber.value, 5);
+      if (res.data || res.data.length > 0) {
+
+        for (const groupMsg of res.data) {
+
+          processGroupMessage(groupMsg);
+
+        }
+        groupMessages.value.unshift(...res.data);
+        currentGroupMessagePageNumber.value++;
+
+      }
+
+      const newClientHeight: number = chatMessageInnerRef.value.clientHeight;
+      chatMessageInnerRef.value.setScrollTop(newClientHeight - oldClientHeight);
+
+    } finally {
+
+      isFetchingHistoryMessages.value = false;
+
+    }
+
+  }
+
+}
 
 
 /**
@@ -845,9 +920,11 @@ async function sendMessage() {
 
     const newMessage: GroupMessage = {
 
-      id: randomUUID(),
+      // 2024-9-11  20:57-为避免前后端由不同雪花生成器生成的ID可能存在冲突不一致的情况 , 因此这里决定非系统消息将由前端统一生成唯一的消息ID
+      // 2024-9-10  23:31-前端不再负责生成消息ID , 而由后端来生成消息雪花ID
+      id: randomSnowID(),
       content: messageContent.value,
-      senderId: 7,
+      senderId: userDataStore.localUserData.id,
       senderNickname: userDataStore.localUserData.nickname,
       senderAvatarUrl: JSON.parse(userDataStore.localUserData?.avatar)?.uri,
       receiverId: -1,

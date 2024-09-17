@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import randomUUID from "@/utils/uuid";
+import {randomUUID} from "@/utils/id";
 import {Page} from "@/model/view/page";
 import {Ref} from "vue";
 

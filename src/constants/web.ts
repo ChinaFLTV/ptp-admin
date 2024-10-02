@@ -8,7 +8,7 @@
  */
 
 // 2024-8-25  21:08-本机的外网IP
-export let SERVER_IP: string = "192.168.124.9";
+export let SERVER_IP: string = "192.168.124.5";
 // 2024-7-11  22:58-PTP在线站点的链接地址
 export const PTP_WEB_SITE_URL: string = `http://${SERVER_IP}:8150`;
 // 2024-8-23  17:35-PTP在线站点的WebSocket链接地址

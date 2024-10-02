@@ -81,7 +81,8 @@ export const loginByNicknameAndPassword = async (nickname: string, password: str
     const loginInfo: Result<Map<string, any>> = await service.post(`${PTP_USER_LOGIN_BASE_URL}/login`, userLoginVo) as Result<Map<string, any>>;
 
     const STORE_KEY: string = loginInfo["data"]["store_key"]; // 2024-8-6  00:44-这就是后续请求都需要带上的权限验证Header——Authorization
-    const user: User = loginInfo["data"]["user"];
+    // 2024-10-3  00:31-由于后端对data中的user数据做了toJSONString处理 , 不再直接存放User数据实体 , 因此这里获取的时候需要进行JSON解析才能当做一个对象使用
+    const user: User = JSON.parse(loginInfo["data"]["user"]);
 
     permissionStore.updateAuthorization(STORE_KEY);
     userDataStore.updateUserData(user);

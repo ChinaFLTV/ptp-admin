@@ -343,7 +343,7 @@ chatRoomClient.addEventListener("open", () => {
 chatRoomClient.addEventListener("message", (event) => {
 
   const wrappedMsgDataMap = JSON.parse(event.data);
-  const groupMessage: GroupMessage = wrappedMsgDataMap.message as GroupMessage;
+  const groupMessage: GroupMessage = JSON.parse(wrappedMsgDataMap.message) as GroupMessage;
 
   // 2024-8-23  23:25-如果群聊消息类型为系统消息时 , 则需要重写一下消息数据 , 以方便前端进行展示
   processGroupMessage(groupMessage);
